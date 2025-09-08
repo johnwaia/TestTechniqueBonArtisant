@@ -1,20 +1,11 @@
 const express = require('express');
-const https = require('https');
+const cors = require('cors');
 const mongoose = require('mongoose');
-const users_routes = require('./routes/users.js')
+require('dotenv').config();
+
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5000;
 
-require('dotenv').config()
-
-mongoose.connect(process.env.MONGO_URI)
-    .then((result) => app.listen(5000))
-    .catch((err) => console.log(Error))
-
-app.use(express.json())
-app.use('/api/users', users_routes)
-
-//gestion des middleware
 app.use((req, res, next) => {
   console.log(`Requête ${req.method} reçue sur ${req.path}`);
 
@@ -34,16 +25,25 @@ app.use((req, res, next) => {
   }
 
   next();
-});
+});app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello from the Node.js backend!');
-});
+// log simple pour voir les requêtes
+app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
 
+app.get('/', (req, res) => res.send('API OK'));
+app.use('/api/users', require('./routes/users')); // <-- ta route
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+const uri = process.env.MONGO_URI;
+if (!uri) { console.error('❌ MONGO_URI manquant'); process.exit(1); }
 
-app.use(express.json())
-app.use('/api/users', users_routes)
+mongoose.connect(uri, { serverSelectionTimeoutMS: 7000 })
+  .then(() => {
+    console.log('✅ MongoDB connecté');
+    app.listen(PORT, '0.0.0.0', () =>
+      console.log(`🚀 API sur http://localhost:${PORT}`)
+    );
+  })
+  .catch(err => {
+    console.error('❌ Erreur connexion MongoDB :', err);
+    process.exit(1);
+  });

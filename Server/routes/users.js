@@ -1,22 +1,44 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 
-const  { 
-    getusers,
-    getuser,
-    createuser,
-    updateuser,
-    deleteuser 
-} = require('../controllers/users.js')
+const router = express.Router();
 
-router.get('/', getusers)
+// POST /api/users/register
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-router.get('/:userID', getuser)
+    // 1) validations simples
+    if (!username || !password) {
+      return res.status(400).json({ message: 'username et password sont requis' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Mot de passe >= 6 caractères' });
+    }
 
-router.post('/', createuser) 
+    // 2) doublons
+    const exists = await User.findOne({ username });
+    if (exists) {
+      return res.status(409).json({ message: 'Ce nom d’utilisateur existe déjà' });
+    }
 
-router.put('/:userID', updateuser) 
+    // 3) hash
+    const passwordHash = await bcrypt.hash(password, 10);
 
-router.delete('/:userID', deleteuser)
+    // 4) insertion
+    const user = await User.create({ username, passwordHash });
 
-module.exports = router
+    // 5) réponse (ne jamais renvoyer le hash)
+    return res.status(201).json({
+      id: user._id,
+      username: user.username,
+      createdAt: user.createdAt,
+    });
+  } catch (err) {
+    console.error('Erreur /register :', err);
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+module.exports = router;

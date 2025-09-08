@@ -3,7 +3,6 @@ const getusers = ((req, res) => {
 })
 
 const getuser = ((req, res) => {
-    const id = Number(req.params.userID)
     const user = users.find(user => user.id === id)
 
         if (!user) {
@@ -14,19 +13,17 @@ const getuser = ((req, res) => {
 
 const createuser = ((req, res) => {
     const newuser = {
-        id: users.length + 1,
-        name: req.body.name,
+        name: req.body.username,
     }
     users.push(newuser)
     res.status(201).json(newuser)
 })
 
 const updateuser = ((req, res) => {
-    const id = Number(req.params.userID)
     const index = users.findIndex(user => user.id === id)
     const updateduser = {
         id: users[index].id,
-        name: req.body.name,
+        name: req.body.username,
     }
 
     users[index] = updateduser
@@ -34,7 +31,6 @@ const updateuser = ((req, res) => {
 })
 
 const deleteuser = ((req, res) => {
-    const id = Number(req.params.userID)
     const index = users.findIndex(user => user.id === id)
     users.splice(index,1)
     res.status(200).json('user deleted')
