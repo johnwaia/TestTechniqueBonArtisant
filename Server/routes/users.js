@@ -1,15 +1,15 @@
+// server/routes/users.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User'); 
 
 const router = express.Router();
 
-// POST /api/users/register
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // 1) validations simples
     if (!username || !password) {
       return res.status(400).json({ message: 'username et password sont requis' });
     }
@@ -17,26 +17,42 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Mot de passe >= 6 caractères' });
     }
 
-    // 2) doublons
     const exists = await User.findOne({ username });
-    if (exists) {
-      return res.status(409).json({ message: 'Ce nom d’utilisateur existe déjà' });
-    }
+    if (exists) return res.status(409).json({ message: 'Ce nom d’utilisateur existe déjà' });
 
-    // 3) hash
     const passwordHash = await bcrypt.hash(password, 10);
-
-    // 4) insertion
     const user = await User.create({ username, passwordHash });
 
-    // 5) réponse (ne jamais renvoyer le hash)
-    return res.status(201).json({
-      id: user._id,
-      username: user.username,
-      createdAt: user.createdAt,
-    });
+    return res.status(201).json({ id: user._id, username: user.username, createdAt: user.createdAt });
   } catch (err) {
     console.error('Erreur /register :', err);
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: 'username et password sont requis' });
+    }
+
+    const user = await User.findOne({ username });
+    if (!user) return res.status(401).json({ message: 'Identifiants invalides' });
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) return res.status(401).json({ message: 'Identifiants invalides' });
+
+    const token = jwt.sign(
+      { sub: user._id.toString(), username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    return res.status(200).json({ token, user: { id: user._id, username: user.username } });
+  } catch (err) {
+    console.error('Erreur /login :', err);
     return res.status(500).json({ message: 'Erreur serveur' });
   }
 });

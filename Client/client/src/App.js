@@ -1,20 +1,67 @@
 // src/App.js
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import Welcome from './pageAcceuil';
 
-export default function App() {
+function Auth() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setMsg('Envoi...');
+    const uname = username.trim();
 
     try {
-      const res = await fetch('/api/users/register', { // <-- URL relative (proxy)
+      const regRes = await fetch('/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
+        body: JSON.stringify({ username: uname, password }),
+      });
+
+      let regData = null;
+      try { regData = await regRes.json(); } catch {}
+
+      if (!regRes.ok && regRes.status !== 409) {
+        setMsg(`❌ ${regData?.message || `Erreur ${regRes.status}`}`);
+        return;
+      }
+      if (regRes.ok) setMsg(`✅ Utilisateur créé : ${regData.username}. Connexion...`);
+
+      const loginRes = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: uname, password }),
+      });
+
+      let loginData = null;
+      try { loginData = await loginRes.json(); } catch {}
+
+      if (!loginRes.ok) {
+        setMsg(`❌ ${loginData?.message || `Erreur login ${loginRes.status}`}`);
+        return;
+      }
+
+      if (loginData?.token) localStorage.setItem('token', loginData.token);
+      localStorage.setItem('lastUsername', loginData?.user?.username || uname);
+
+      navigate('/welcome', { state: { username: loginData?.user?.username || uname } });
+    } catch {
+      setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
+    }
+  };
+
+  const handleLoginOnly = async () => {
+    setMsg('Connexion...');
+    const uname = username.trim();
+
+    try {
+      const res = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: uname, password }),
       });
 
       let data = null;
@@ -25,16 +72,17 @@ export default function App() {
         return;
       }
 
-      setMsg(`✅ Utilisateur créé : ${data.username} (id: ${data.id})`);
-      setUsername('');
-      setPassword('');
+      if (data?.token) localStorage.setItem('token', data.token);
+      localStorage.setItem('lastUsername', data?.user?.username || uname);
+
+      navigate('/pageAcceuil', { state: { username: data?.user?.username || uname } });
     } catch {
       setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleRegister}>
       <input
         id="username"
         placeholder="username"
@@ -53,10 +101,22 @@ export default function App() {
         onChange={(e) => setPassword(e.target.value)}
         required
         minLength={6}
-        autoComplete="new-password"
+        autoComplete="current-password"
       />
       <button type="submit">Créer le compte</button>
+      <button type="button" onClick={handleLoginOnly}>Connexion</button>
       {msg && <div>{msg}</div>}
     </form>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route path="/pageAcceuil" element={<Welcome />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
