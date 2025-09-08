@@ -47,7 +47,7 @@ function Auth() {
       if (loginData?.token) localStorage.setItem('token', loginData.token);
       localStorage.setItem('lastUsername', loginData?.user?.username || uname);
 
-      navigate('/welcome', { state: { username: loginData?.user?.username || uname } });
+      navigate('/pageAcceuil', { state: { username: loginData?.user?.username || uname } });
     } catch {
       setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
     }
