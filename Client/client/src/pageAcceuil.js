@@ -23,10 +23,14 @@ export default function Welcome() {
     navigate('/', { replace: true });
   };
 
+  const handleAddContact = () => {
+    navigate('/addContact');
+  }
+
   return (
     <div>
       <div>Bienvenue, {username} !</div>
-        <button>Ajouter un contact</button>
+        <button onClick={handleAddContact}>Ajouter un contact</button>
         <button>Voir mes contacts</button>
         <button onClick={handleLogout}>Déconnexion</button>
     </div>

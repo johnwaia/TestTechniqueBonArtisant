@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Welcome from './pageAcceuil';
+import AddContact from './addContact';
 
 function Auth() {
   const [username, setUsername] = useState('');
@@ -81,7 +82,6 @@ function Auth() {
     }
   };
 
-
   return (
     <form onSubmit={handleRegister}>
       <input
@@ -116,6 +116,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/pageAcceuil" element={<Welcome />} />
+        <Route path="/addContact" element={<AddContact />} />
       </Routes>
     </BrowserRouter>
   );
