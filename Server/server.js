@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const usersRoutes = require('./routes/users');
+const contactsRoutes = require('./routes/contacts');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,12 +28,15 @@ app.use((req, res, next) => {
   }
 
   next();
-});app.use(express.json());
+});
+app.use(express.json());
 
 app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
 
 app.get('/', (req, res) => res.send('API OK'));
+
 app.use('/api/users', usersRoutes);
+app.use('/api', contactsRoutes);
 
 const uri = process.env.MONGO_URI;
 if (!uri) { console.error('❌ MONGO_URI manquant'); process.exit(1); }

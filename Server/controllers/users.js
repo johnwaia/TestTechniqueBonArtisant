@@ -4,7 +4,6 @@ const getusers = ((req, res) => {
 
 const getuser = ((req, res) => {
     const user = users.find(user => user.id === id)
-
         if (!user) {
         return res.status(404).send('user not found')
     }

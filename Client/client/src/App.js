@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Welcome from './pageAcceuil';
@@ -6,6 +5,7 @@ import Welcome from './pageAcceuil';
 function Auth() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
   const [msg, setMsg] = useState('');
   const navigate = useNavigate();
 
@@ -81,6 +81,7 @@ function Auth() {
     }
   };
 
+
   return (
     <form onSubmit={handleRegister}>
       <input
@@ -109,7 +110,6 @@ function Auth() {
     </form>
   );
 }
-
 export default function App() {
   return (
     <BrowserRouter>
