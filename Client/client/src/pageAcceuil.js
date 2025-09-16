@@ -1,6 +1,13 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+// Base URL de l'API (prod Render + fallback env + local éventuel)
+const API_BASE = (
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
+  process.env.REACT_APP_API_BASE ||
+  'https://authentification-fullstack.onrender.com'
+).replace(/\/+$/, '');
+
 export default function Welcome() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,8 +37,8 @@ export default function Welcome() {
   const handleSeeContacts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/contact', {
-        headers: { 'Authorization': `Bearer ${token}` },
+      const response = await fetch(`${API_BASE}/api/contact`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la récupération des contacts');
       const data = await response.json();
@@ -43,13 +50,13 @@ export default function Welcome() {
 
   const handleDeleteContact = async (id) => {
     try {
-      const token = localStorage.getItem('token');  
-      const response = await fetch(`http://localhost:5000/api/contact/${id}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/contact/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression du contact');
-      setContacts(contacts.filter(contact => contact._id !== id));
+      setContacts((prev) => prev.filter((contact) => (contact._id || contact.id) !== id));
     } catch (error) {
       console.error(error);
     }
@@ -57,7 +64,7 @@ export default function Welcome() {
 
   const handleEditContact = (id) => {
     navigate(`/editContact/${id}`);
-  };  
+  };
 
   return (
     <div>
@@ -81,8 +88,8 @@ export default function Welcome() {
                 <td>{c.contactname}</td>
                 <td>{c.contactFirstname}</td>
                 <td>{c.contactPhone}</td>
-                <td><button onClick={() => handleEditContact(c._id)}>modifier</button></td>
-                <td><button onClick={() => handleDeleteContact(c._id)}>supprimer</button></td>
+                <td><button onClick={() => handleEditContact(c._id || c.id)}>modifier</button></td>
+                <td><button onClick={() => handleDeleteContact(c._id || c.id)}>supprimer</button></td>
               </tr>
             ))}
           </tbody>

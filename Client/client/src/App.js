@@ -4,6 +4,13 @@ import Welcome     from './pageAcceuil';
 import AddContact  from './addContact';
 import EditContact from './editContact';
 
+// Base URL de l'API (prod Render + fallback env + local)
+const API_BASE = (
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
+  process.env.REACT_APP_API_BASE ||
+  'https://authentification-fullstack.onrender.com'
+).replace(/\/+$/, ''); // retire le / final s'il existe
+
 function Auth() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +24,7 @@ function Auth() {
     const uname = username.trim();
 
     try {
-      const regRes = await fetch('/api/users/register', {
+      const regRes = await fetch(`${API_BASE}/api/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: uname, password }),
@@ -32,7 +39,7 @@ function Auth() {
       }
       if (regRes.ok) setMsg(`✅ Utilisateur créé : ${regData.username}. Connexion...`);
 
-      const loginRes = await fetch('/api/users/login', {
+      const loginRes = await fetch(`${API_BASE}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: uname, password }),
@@ -60,7 +67,7 @@ function Auth() {
     const uname = username.trim();
 
     try {
-      const res = await fetch('/api/users/login', {
+      const res = await fetch(`${API_BASE}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: uname, password }),
@@ -110,6 +117,7 @@ function Auth() {
     </form>
   );
 }
+
 export default function App() {
   return (
     <BrowserRouter>

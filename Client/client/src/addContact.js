@@ -1,26 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Base URL de l'API (prod Render + fallback env + local éventuel)
+const API_BASE = (
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
+  process.env.REACT_APP_API_BASE ||
+  'https://authentification-fullstack.onrender.com'
+).replace(/\/+$/, '');
+
 export default function AddContact() {
   const [contactname, setContactname] = React.useState('');
   const [contactFirstname, setcontactFirstname] = React.useState('');
   const [contactPhone, setcontactPhone] = React.useState('');
   const [msg, setMsg] = React.useState('');
   const navigate = useNavigate();
-  
 
   const handleRegisterContact = async (e) => {
     e.preventDefault();
     setMsg('Envoi...');
-    const cname = contactname.trim();
 
     try {
       const token = localStorage.getItem('token');
-      const regRes = await fetch('/api/contact', {
+      const regRes = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           contactname: contactname.trim(),
@@ -32,13 +37,11 @@ export default function AddContact() {
       let regData = null;
       try { regData = await regRes.json(); } catch {}
 
-      if (!regRes.ok && regRes.status !== 409) {
+      if (!regRes.ok) {
         setMsg(`❌ ${regData?.message || `Erreur ${regRes.status}`}`);
         return;
       }
-      if (regRes.ok) {
-        setMsg(`✅ Contact créé : ${regData.contactname}`);
-      }
+      setMsg(`✅ Contact créé : ${regData.contactname}`);
     } catch {
       setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
     }
