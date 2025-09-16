@@ -87,12 +87,14 @@ function Auth() {
     <form onSubmit={handleRegister}>
       <input
         id="username"
-        placeholder="username"
+        type="email"
+        placeholder="email"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        autoComplete="username"
+        autoComplete="email"
       />
+
       <input
         id="password"
         placeholder="password"
