@@ -27,25 +27,38 @@ export default function Welcome() {
     navigate('/addContact');
   };
 
- const handleSeeContacts = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/contact', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error('Erreur lors de la récupération des contacts');
-    const data = await response.json();
-    setContacts(data);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  const handleSeeContacts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/contact', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Erreur lors de la récupération des contacts');
+      const data = await response.json();
+      setContacts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    try {
+      const token = localStorage.getItem('token');  
+      const response = await fetch(`http://localhost:5000/api/contact/${contactId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Erreur lors de la suppression du contact');
+      setContacts(contacts.filter(contact => contact._id !== contactId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div>
       <div>Bienvenue, {username} !</div>
       <button onClick={handleAddContact}>Ajouter un contact</button>
-      {/* ⬇️ corriger ici: ce bouton appelait avant handleAddContact */}
       <button onClick={handleSeeContacts}>Voir mes contacts</button>
       <button onClick={handleLogout}>Déconnexion</button>
 
@@ -64,6 +77,8 @@ export default function Welcome() {
                 <td>{c.contactname}</td>
                 <td>{c.contactFirstname}</td>
                 <td>{c.contactPhone}</td>
+                <td><button>modifier</button></td>
+                <td><button onClick={handleDeleteContact}>supprimer</button></td>
               </tr>
             ))}
           </tbody>

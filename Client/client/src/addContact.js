@@ -15,13 +15,12 @@ export default function AddContact() {
     const cname = contactname.trim();
 
     try {
-      // addContact.js (extrait)
       const token = localStorage.getItem('token');
       const regRes = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // ← indispensable
+          'Authorization': `Bearer ${token}`, 
         },
         body: JSON.stringify({
           contactname: contactname.trim(),
@@ -39,8 +38,6 @@ export default function AddContact() {
       }
       if (regRes.ok) {
         setMsg(`✅ Contact créé : ${regData.contactname}`);
-        // Optionnel: navigation ou reset
-        // navigate('/pageAcceuil');
       }
     } catch {
       setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');

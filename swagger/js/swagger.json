@@ -1,0 +1,194 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API d'Authentification",
+        "version": "1.0.0",
+        "description": "API pour la gestion de l'authentification des utilisateurs."
+                },
+    "servers": [
+        {
+            "url": "http://localhost:5000",
+            "description": "Serveur local"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Utilisateurs",
+            "description": "Opérations liées aux utilisateurs"
+        },
+        {
+            "name": "Contacts",
+            "description": "Opérations liées aux contacts"
+        }
+    ],
+    "paths": {
+        "/api/users/register": {
+            "post": {
+                "tags": ["Utilisateurs"],
+                "summary": "Enregistrer un nouvel utilisateur",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": { "type": "string" },
+                                    "password": { "type": "string" }
+                                },
+                                "required": ["username", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé avec succès"
+                    },
+                    "400": {
+                        "description": "Requête invalide"
+                    },
+                    "409": {
+                        "description": "Nom d'utilisateur déjà pris"
+                    }
+                }
+            }
+        },
+        "/api/users/login": {
+            "post": {
+                "tags": ["Utilisateurs"],
+                "summary": "Authentifier un utilisateur",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": { "type": "string" },
+                                    "password": { "type": "string" }
+                                },
+                                "required": ["username", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentification réussie"
+                    },
+                    "400": {
+                        "description": "Requête invalide"
+                    },
+                    "401": {
+                        "description": "Nom d'utilisateur ou mot de passe incorrect"
+                    }
+                }
+            }
+        },
+        "/api/contact": {
+            "post": {
+                "tags": ["Contacts"],
+                "summary": "Ajouter un nouveau contact",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "contactname": { "type": "string" },
+                                    "contactFirstname": { "type": "string" },
+                                    "contactPhone": { "type": "string" }
+                                },
+                                "required": ["contactname", "contactFirstname", "contactPhone"]  
+                            }
+                                
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Contact créé avec succès"
+                    },
+                    "400": {
+                        "description": "Requête invalide"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    }
+                }
+            },
+            "get": {
+                "tags": ["Contacts"],
+                "summary": "Récupérer tous les contacts de l'utilisateur authentifié",
+                "responses": {
+                    "200": {
+                        "description": "Liste des contacts récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/contacts" }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Contacts"],
+                "summary": "Supprimer un contact par son ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "ID du contact à supprimer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contact supprimé avec succès"
+                    },
+                    "400": {
+                        "description": "Requête invalide"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "404": {
+                        "description": "Contact non trouvé"
+                    }
+                }
+            }
+    },
+    "components": {
+        "schemas": {
+            "users": {
+                "type": "object",
+                "properties": {
+                    "_id": { "type": "string" },
+                    "username": { "type": "string" },
+                    "password": { "type": "string" }
+                }
+            },
+            "contacts": {
+                "type": "object",
+                "properties": {
+                    "_id": { "type": "string" },
+                    "contactname": { "type": "string" },
+                    "contactFirstname": { "type": "string" },
+                    "contactPhone": { "type": "string" },
+                    "createdby": { "type": "string" }
+                }
+            }
+        }
+}
+
+
+}}

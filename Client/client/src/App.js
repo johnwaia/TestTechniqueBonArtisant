@@ -90,8 +90,6 @@ function Auth() {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        minLength={3}
-        maxLength={30}
         autoComplete="username"
       />
       <input
@@ -101,7 +99,6 @@ function Auth() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        minLength={6}
         autoComplete="current-password"
       />
       <button type="submit">Créer le compte</button>

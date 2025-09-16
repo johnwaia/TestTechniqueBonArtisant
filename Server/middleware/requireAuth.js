@@ -1,7 +1,6 @@
-// middleware/requireAuth.js
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const User = require('../models/user'); // <-- assure-toi que ce chemin est correct
+const User = require('../models/user'); 
 
 module.exports = async function requireAuth(req, res, next) {
   try {
@@ -12,19 +11,16 @@ module.exports = async function requireAuth(req, res, next) {
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 1) essais directs
     let userId =
       payload?.id ||
       payload?._id ||
       payload?.userId ||
       payload?.user?._id ||
       payload?.user?.id ||
-      payload?.sub; // parfois utilisé
+      payload?.sub; 
 
-    // Si c'est un ObjectId non string
     if (userId && typeof userId !== 'string') userId = String(userId);
 
-    // 2) fallback: lookup par username/email si présent dans le token
     if (!userId && (payload?.username || payload?.email)) {
       const query = payload.username
         ? { username: payload.username }

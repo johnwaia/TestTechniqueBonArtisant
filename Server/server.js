@@ -13,15 +13,16 @@ app.use((req, res, next) => {
   console.log(`Requête ${req.method} reçue sur ${req.path}`);
 
   const origin = req.headers.origin;
-  const allowedOrigins = ['http://localhost:3000'];
+  const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080'];
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     console.log('Réponse rapide OPTIONS 204');
@@ -30,6 +31,13 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
