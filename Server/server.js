@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 
 app.use(cors({
   origin: ['http://localhost:3000'],
-  methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
+  methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));

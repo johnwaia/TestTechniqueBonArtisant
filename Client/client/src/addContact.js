@@ -76,6 +76,7 @@ export default function AddContact() {
           autoComplete="tel"
         />
         <button type="submit">Créer le contact</button>
+        <button type="button" onClick={() => navigate(-1)}>Retour</button>
         {msg && <div>{msg}</div>}
       </form>
     </div>

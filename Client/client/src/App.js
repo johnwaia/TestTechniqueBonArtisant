@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import Welcome from './pageAcceuil';
-import AddContact from './addContact';
+import Welcome     from './pageAcceuil';
+import AddContact  from './addContact';
+import EditContact from './editContact';
 
 function Auth() {
   const [username, setUsername] = useState('');
@@ -113,7 +114,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/pageAcceuil" element={<Welcome />} />
-        <Route path="/addContact" element={<AddContact />} />
+        <Route path="/addContact"  element={<AddContact />} />
+        <Route path="/editContact/:id" element={<EditContact />} />
       </Routes>
     </BrowserRouter>
   );

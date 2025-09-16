@@ -46,7 +46,7 @@ export default function Welcome() {
       const token = localStorage.getItem('token');  
       const response = await fetch(`http://localhost:5000/api/contact/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 'Authorization': `Bearer ${token}`},
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression du contact');
       setContacts(contacts.filter(contact => contact._id !== id));
@@ -81,7 +81,7 @@ export default function Welcome() {
                 <td>{c.contactname}</td>
                 <td>{c.contactFirstname}</td>
                 <td>{c.contactPhone}</td>
-                <td><button>modifier</button></td>
+                <td><button onClick={() => handleEditContact(c._id)}>modifier</button></td>
                 <td><button onClick={() => handleDeleteContact(c._id)}>supprimer</button></td>
               </tr>
             ))}
