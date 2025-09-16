@@ -60,12 +60,12 @@ router.get('/contact', async (req, res) => {
 router.delete('/contact/:id', async (req, res) => {
   try {
     if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-    const contact = await Contact.findOneAndDelete({ _id: req.params.ObjectId, createdby: req.user.id });
+    const contact = await Contact.findOneAndDelete({ _id: req.params.id, createdby: req.user.id });
     if (!contact) return res.status(404).json({ message: 'Contact non trouvé' });
     return res.status(200).json({ message: 'Contact supprimé' });
   }
   catch (err) {
-    console.error('Erreur DELETE /contact/id :', err);
+    console.error('Erreur DELETE /contact/:id :', err);
     return res.status(500).json({ message: 'Erreur serveur' });
   }
 });

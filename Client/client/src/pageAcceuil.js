@@ -41,19 +41,23 @@ export default function Welcome() {
     }
   };
 
-  const handleDeleteContact = async (contactId) => {
+  const handleDeleteContact = async (id) => {
     try {
       const token = localStorage.getItem('token');  
-      const response = await fetch(`http://localhost:5000/api/contact/${contactId}`, {
+      const response = await fetch(`http://localhost:5000/api/contact/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression du contact');
-      setContacts(contacts.filter(contact => contact._id !== contactId));
+      setContacts(contacts.filter(contact => contact._id !== id));
     } catch (error) {
       console.error(error);
     }
   };
+
+  const handleEditContact = (id) => {
+    navigate(`/editContact/${id}`);
+  };  
 
   return (
     <div>
@@ -78,7 +82,7 @@ export default function Welcome() {
                 <td>{c.contactFirstname}</td>
                 <td>{c.contactPhone}</td>
                 <td><button>modifier</button></td>
-                <td><button onClick={handleDeleteContact}>supprimer</button></td>
+                <td><button onClick={() => handleDeleteContact(c._id)}>supprimer</button></td>
               </tr>
             ))}
           </tbody>
