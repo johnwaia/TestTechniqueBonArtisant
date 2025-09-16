@@ -17,10 +17,10 @@ const PORT = process.env.PORT || 5000;
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:8080',
-  'https://radiant-alfajores-52e968.netlify.app', // ← ton site Netlify (sans slash final)
+  'https://radiant-alfajores-52e968.netlify.app', // ton site Netlify (sans slash final)
 ];
 
-// Autorise aussi les deploy previews Netlify (*.netlify.app)
+// Autorise aussi les deploy-previews Netlify (*.netlify.app)
 const corsOptions = {
   origin(origin, cb) {
     if (!origin) return cb(null, true); // Postman / server-to-server
@@ -38,11 +38,17 @@ const corsOptions = {
   credentials: false, // pas de cookies cross-site (on utilise un Bearer token)
 };
 
-// Monte CORS AVANT les routes
+// Monte CORS AVANT tout
 app.use(cors(corsOptions));
 
-// ✅ Express 5: ne pas utiliser '*' ici. Utiliser un pattern compatible:
-app.options('/(.*)', cors(corsOptions)); // préflights pour toutes les routes
+// ✅ Préflight universel compatible Express 5
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    // À ce stade, cors() a déjà posé les bons en-têtes
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 /* =========================
    Middlewares de base
