@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:8080'],
+  origin: ['http://localhost:3000', 'http://localhost:8080','https://radiant-alfajores-52e968.netlify.app/'],
   methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PATCH', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
