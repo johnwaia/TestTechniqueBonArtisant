@@ -4,12 +4,11 @@ import Welcome     from './pageAcceuil';
 import AddContact  from './addContact';
 import EditContact from './editContact';
 
-// Base URL de l'API (prod Render + fallback env + local)
 const API_BASE = (
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
   process.env.REACT_APP_API_BASE ||
   'https://authentification-fullstack.onrender.com'
-).replace(/\/+$/, ''); // retire le / final s'il existe
+).replace(/\/+$/, '');
 
 function Auth() {
   const [username, setUsername] = useState('');

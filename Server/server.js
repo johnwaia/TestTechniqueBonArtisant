@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -11,19 +10,16 @@ const Contact = require('./models/contact'); // pour syncIndexes()
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-/* =========================
-   CORS (Netlify + local)
-   ========================= */
+
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:8080',
-  'https://radiant-alfajores-52e968.netlify.app', // ton site Netlify (sans slash final)
+  'https://radiant-alfajores-52e968.netlify.app', // site Netlify
 ];
 
-// Autorise aussi les deploy-previews Netlify (*.netlify.app)
 const corsOptions = {
   origin(origin, cb) {
-    if (!origin) return cb(null, true); // Postman / server-to-server
+    if (!origin) return cb(null, true); 
     try {
       const host = new URL(origin).hostname;
       const isNetlifyPreview = /\.netlify\.app$/.test(host);
@@ -35,41 +31,29 @@ const corsOptions = {
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false, // pas de cookies cross-site (on utilise un Bearer token)
+  credentials: false, 
 };
 
-// Monte CORS AVANT tout
 app.use(cors(corsOptions));
 
-// ✅ Préflight universel compatible Express 5
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
-    // À ce stade, cors() a déjà posé les bons en-têtes
     return res.sendStatus(204);
   }
   next();
 });
 
-/* =========================
-   Middlewares de base
-   ========================= */
 app.use(express.json());
 app.use((req, _res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
 });
 
-/* =========================
-   Routes
-   ========================= */
 app.get('/', (_req, res) => res.send('API OK'));
 
 app.use('/api/users', usersRoutes);
 app.use('/api', contactsRoutes);
 
-/* =========================
-   DB & Lancement serveur
-   ========================= */
 const uri = process.env.MONGO_URI;
 if (!uri) {
   console.error('❌ MONGO_URI manquant');
@@ -81,7 +65,6 @@ mongoose
   .then(async () => {
     console.log('✅ MongoDB connecté');
 
-    // Synchronise les indexes (ex: unique { createdby, contactname })
     try {
       await Contact.syncIndexes();
       console.log('✅ Indexes synchronisés');
