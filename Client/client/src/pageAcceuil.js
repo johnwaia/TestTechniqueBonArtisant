@@ -65,35 +65,59 @@ export default function Welcome() {
     navigate(`/editContact/${id}`);
   };
 
-  return (
-    <div>
-      <div>Bienvenue, {username} !</div>
-      <button onClick={handleAddContact}>Ajouter un contact</button>
-      <button onClick={handleSeeContacts}>Voir mes contacts</button>
-      <button onClick={handleLogout}>Déconnexion</button>
 
-      {contacts.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Prénom</th>
-              <th>Téléphone</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contacts.map((c) => (
-              <tr key={c._id || c.id}>
-                <td>{c.contactname}</td>
-                <td>{c.contactFirstname}</td>
-                <td>{c.contactPhone}</td>
-                <td><button onClick={() => handleEditContact(c._id || c.id)}>modifier</button></td>
-                <td><button onClick={() => handleDeleteContact(c._id || c.id)}>supprimer</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+  return (
+    <main className="container">
+      <header className="header">
+        <div className="brand">
+          <div className="logo" />
+          <span>Contacts App</span>
+        </div>
+        <div className="actions">
+          <button onClick={handleAddContact} className="btn btn-primary">Ajouter un contact</button>
+          <button onClick={handleSeeContacts} className="btn">Voir mes contacts</button>
+          <button onClick={handleLogout} className="btn btn-ghost">Déconnexion</button>
+        </div>
+      </header>
+
+      <section className="card">
+        <div style={{marginBottom:8}}>Bienvenue, <strong>{username}</strong> !</div>
+
+        {contacts.length > 0 ? (
+          <div className="table-wrap" role="region" aria-label="Liste de contacts">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Téléphone</th>
+                  <th style={{width:180}}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contacts.map((c) => {
+                  const id = c._id || c.id;
+                  return (
+                    <tr key={id}>
+                      <td>{c.contactname}</td>
+                      <td>{c.contactFirstname}</td>
+                      <td>{c.contactPhone}</td>
+                      <td>
+                        <div className="actions">
+                          <button onClick={() => handleEditContact(id)} className="btn">Modifier</button>
+                          <button onClick={() => handleDeleteContact(id)} className="btn btn-danger">Supprimer</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="msg">Clique sur <em>“Voir mes contacts”</em> pour charger ta liste.</div>
+        )}
+      </section>
+    </main>
   );
 }

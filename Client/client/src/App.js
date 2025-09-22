@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Welcome     from './pageAcceuil';
 import AddContact  from './addContact';
 import EditContact from './editContact';
+import './App.css';
 
 const API_BASE = (
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
@@ -89,31 +90,57 @@ function Auth() {
     }
   };
 
-  return (
-    <form onSubmit={handleRegister}>
-      <input
-        id="username"
-        type="email"
-        placeholder="email"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-        autoComplete="email"
-      />
+  const isError = msg.startsWith('❌');
+  const isSuccess = msg.startsWith('✅');
 
-      <input
-        id="password"
-        placeholder="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        autoComplete="current-password"
-      />
-      <button type="submit">Créer le compte</button>
-      <button type="button" onClick={handleLoginOnly}>Connexion</button>
-      {msg && <div>{msg}</div>}
-    </form>
+  return (
+    <main className="container">
+      <header className="header">
+        <div className="brand">
+          <div className="logo" />
+          <span>Contacts App</span>
+        </div>
+      </header>
+
+      <section className="card" aria-label="Authentification">
+        <form onSubmit={handleRegister} className="form" autoComplete="on">
+          <div className="row">
+            <input
+              id="username"
+              type="email"
+              placeholder="Email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoComplete="email"
+              className="input"
+              autoFocus
+            />
+            <input
+              id="password"
+              placeholder="Mot de passe"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="input"
+            />
+          </div>
+
+          <div className="actions">
+            <button type="submit" className="btn btn-primary">Créer le compte</button>
+            <button type="button" onClick={handleLoginOnly} className="btn">Connexion</button>
+          </div>
+
+          {msg && (
+            <div className={`msg ${isError ? 'error' : ''} ${isSuccess ? 'success' : ''}`}>
+              {msg}
+            </div>
+          )}
+        </form>
+      </section>
+    </main>
   );
 }
 

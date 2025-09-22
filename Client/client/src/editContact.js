@@ -70,41 +70,70 @@ export default function EditContact() {
     }
   };
 
+  const isError = msg.startsWith('❌');
+  const isSuccess = msg.startsWith('✅');
+
   return (
-    <div>
-      <form onSubmit={handleChangeContact}>
-        <input
-          id="contactname"
-          placeholder="Nom"
-          value={contactname}
-          onChange={(e) => setContactname(e.target.value)}
-          required
-          minLength={3}
-          maxLength={30}
-          autoComplete="contactname"
-        />
-        <input
-          id="contactFirstname"
-          placeholder="Prénom"
-          value={contactFirstname}
-          onChange={(e) => setcontactFirstname(e.target.value)}
-          required
-          minLength={2}
-          autoComplete="given-name"
-        />
-        <input
-          id="contactPhone"
-          placeholder="Téléphone"
-          value={contactPhone}
-          onChange={(e) => setcontactPhone(e.target.value)}
-          required
-          minLength={6}
-          autoComplete="tel"
-        />
-        <button type="submit">Modifier le contact</button>
-        <button type="button" onClick={() => navigate(-1)}>Retour</button>
-        {msg && <div>{msg}</div>}
-      </form>
-    </div>
+    <main className="container">
+      <header className="header">
+        <div className="brand">
+          <div className="logo" />
+          <span>Modifier le contact</span>
+        </div>
+        <div className="actions">
+          <button type="button" onClick={() => navigate(-1)} className="btn">Retour</button>
+        </div>
+      </header>
+
+      <section className="card">
+        <form onSubmit={handleChangeContact} className="form">
+          <div className="row">
+            <input
+              id="contactname"
+              placeholder="Nom"
+              value={contactname}
+              onChange={(e) => setContactname(e.target.value)}
+              required
+              minLength={3}
+              maxLength={30}
+              autoComplete="family-name"
+              className="input"
+              autoFocus
+            />
+            <input
+              id="contactFirstname"
+              placeholder="Prénom"
+              value={contactFirstname}
+              onChange={(e) => setcontactFirstname(e.target.value)}
+              required
+              minLength={2}
+              autoComplete="given-name"
+              className="input"
+            />
+          </div>
+          <input
+            id="contactPhone"
+            placeholder="Téléphone"
+            value={contactPhone}
+            onChange={(e) => setcontactPhone(e.target.value)}
+            required
+            minLength={6}
+            autoComplete="tel"
+            className="input"
+          />
+
+          <div className="actions">
+            <button type="submit" className="btn btn-primary">Modifier</button>
+            <button type="button" onClick={() => navigate(-1)} className="btn">Retour</button>
+          </div>
+
+          {msg && (
+            <div className={`msg ${isError ? 'error' : ''} ${isSuccess ? 'success' : ''}`}>
+              {msg}
+            </div>
+          )}
+        </form>
+      </section>
+    </main>
   );
 }

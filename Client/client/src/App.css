@@ -36,3 +36,183 @@
     transform: rotate(360deg);
   }
 }
+/* ====== Design System ====== */
+:root{
+  --bg: #0b0c10;
+  --panel: #12141a;
+  --muted: #8a8f98;
+  --text: #e9edf1;
+  --primary: #5b8cff;
+  --primary-600:#467dff;
+  --primary-700:#336dff;
+  --danger: #ff5b6b;
+  --success:#38d39f;
+  --warning:#ffb020;
+  --ring: 0 0 0 3px color-mix(in oklab, var(--primary) 30%, transparent);
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+  --border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+  --grid-max: 980px;
+}
+
+/* Light mode si l’OS est clair */
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f7f8fa;
+    --panel:#ffffff;
+    --text:#0f172a;
+    --muted:#536072;
+    --border:1px solid rgba(15,23,42,.08);
+    --shadow: 0 10px 30px rgba(2,8,23,.08);
+  }
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  background: radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--primary) 12%, transparent), transparent) fixed,
+              var(--bg);
+  color:var(--text);
+}
+
+/* ====== Layout ====== */
+.container{
+  max-width: var(--grid-max);
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px;
+}
+.brand{
+  display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.3px;
+}
+.brand .logo{
+  width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 60%, black));
+  box-shadow: var(--shadow);
+}
+
+/* ====== Surfaces ====== */
+.card{
+  background:var(--panel);
+  border:var(--border);
+  border-radius:var(--radius);
+  box-shadow: var(--shadow);
+  padding:24px;
+  backdrop-filter: blur(6px);
+}
+
+/* ====== Formulaires ====== */
+.form{
+  display:grid; gap:14px;
+}
+.form .row{
+  display:grid; gap:12px;
+}
+@media (min-width:640px){
+  .form .row{ grid-template-columns: 1fr 1fr; }
+}
+.input{
+  width:100%;
+  padding:12px 14px;
+  background: color-mix(in oklab, var(--panel) 85%, black);
+  color:var(--text);
+  border:var(--border);
+  border-radius:12px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, transform .08s ease;
+}
+.input:focus{
+  box-shadow: var(--ring);
+  border-color: var(--primary);
+}
+.input::placeholder{ color: color-mix(in oklab, var(--muted) 70%, transparent); }
+
+.actions{
+  display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;
+}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:.5rem;
+  padding:10px 14px;
+  border-radius:12px;
+  border:var(--border);
+  background:linear-gradient(0deg, color-mix(in oklab, var(--panel) 90%, black), var(--panel));
+  color:var(--text);
+  cursor:pointer;
+  transition: transform .08s ease, filter .2s, background .2s, border-color .2s;
+}
+.btn:hover{ filter:brightness(1.05) }
+.btn:active{ transform: translateY(1px) }
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--primary-600), var(--primary));
+  border-color: transparent;
+  color:white;
+}
+.btn-primary:hover{ filter: saturate(115%) brightness(1.02) }
+.btn-danger{
+  background: linear-gradient(135deg, color-mix(in oklab, var(--danger) 80%, black), var(--danger));
+  border-color: transparent;
+  color:white;
+}
+.btn-ghost{
+  background: transparent;
+}
+
+/* Labels d’état */
+.msg{ margin-top:6px; font-size:.95rem; color:var(--muted) }
+.msg.success{ color: var(--success) }
+.msg.error{ color: var(--danger) }
+
+/* ====== Table ====== */
+.table-wrap{
+  margin-top:18px;
+  overflow:auto;
+  border-radius:14px;
+  border:var(--border);
+  box-shadow: var(--shadow);
+}
+table{
+  width:100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+thead th{
+  text-align:left;
+  font-weight:600;
+  font-size:.95rem;
+  color: var(--muted);
+  padding:14px 16px;
+  border-bottom: var(--border);
+  position:sticky; top:0; background:var(--panel);
+}
+tbody td{
+  padding:14px 16px; border-top: var(--border);
+}
+tbody tr:hover{
+  background: color-mix(in oklab, var(--panel) 80%, black);
+}
+
+/* ====== Utils ====== */
+.center{ display:grid; place-items:center; }
+.spacer{ height:16px }
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  background: radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--primary) 12%, transparent), transparent) fixed,
+              var(--bg);
+  color:var(--text);
+  transition: background .3s ease, color .3s ease; /* <-- ajouté */
+}
+
+.sr-only{
+  position:absolute !important;
+  width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
