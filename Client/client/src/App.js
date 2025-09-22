@@ -4,6 +4,7 @@ import Welcome     from './pageAcceuil';
 import AddContact  from './addContact';
 import EditContact from './editContact';
 import './App.css';
+import carnetImg from './assets/carnet.png';
 
 const API_BASE = (
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
@@ -94,15 +95,14 @@ function Auth() {
   const isSuccess = msg.startsWith('✅');
 
   return (
-    <main className="container">
-      <header className="header">
-        <div className="brand">
-          <div className="logo" />
-          <span>Contacts App</span>
-        </div>
-      </header>
-
+    <main className="container center">
       <section className="card" aria-label="Authentification">
+        <img
+          src={carnetImg}
+          alt="Carnet de contacts futuriste"
+          className="login-illustration"
+        />
+
         <form onSubmit={handleRegister} className="form" autoComplete="on">
           <div className="row">
             <input
@@ -142,6 +142,7 @@ function Auth() {
       </section>
     </main>
   );
+
 }
 
 export default function App() {

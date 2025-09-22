@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import carnetImg from './assets/carnet.png';
 
 const API_BASE = (
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
@@ -70,9 +71,13 @@ export default function Welcome() {
     <main className="container">
       <header className="header">
         <div className="brand">
-          <div className="logo" />
-          <span>Contacts App</span>
+          <img
+            src={carnetImg}
+            alt="Carnet de contacts"
+            className="brand-logo"
+          />
         </div>
+        <span className="brand-text">Mon carnet de contacts</span>
         <div className="actions">
           <button onClick={handleAddContact} className="btn btn-primary">Ajouter un contact</button>
           <button onClick={handleSeeContacts} className="btn">Voir mes contacts</button>

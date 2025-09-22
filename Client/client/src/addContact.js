@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
+import carnetImg from './assets/carnet.png';
 
 const API_BASE = (
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
@@ -41,6 +43,12 @@ export default function AddContact() {
         return;
       }
       setMsg(`✅ Contact créé : ${regData.contactname}`);
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
     } catch {
       setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
     }
@@ -51,11 +59,15 @@ export default function AddContact() {
 
   return (
     <main className="container">
-      <header className="header">
-        <div className="brand">
-          <div className="logo" />
-          <span>Nouveau contact</span>
-        </div>
+          <header className="header">
+            <div className="brand">
+              <img
+                src={carnetImg}
+                alt="Carnet de contacts"
+                className="brand-logo"
+              />
+            </div>
+            <span className="brand-text">Créer de contacts</span>
         <div className="actions">
           <button type="button" onClick={() => navigate(-1)} className="btn">Retour</button>
         </div>
