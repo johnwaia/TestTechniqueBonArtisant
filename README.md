@@ -41,6 +41,14 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 │ ├── addProduct.js
 │ ├── editProduct.js
 │
+├── docs/
+│ ├── affichage_produits.png
+│ ├── ajouter_produit.png
+│ ├── bdd_mongoDB.png
+│ ├── ecran_acceuil.png
+│ ├── modifier_produit.png
+│ ├── page_acceuil.png
+│
 ├── server/
 │ ├── server.js
 │ ├── routes/
@@ -52,6 +60,19 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 │ ├── middleware/
 │ │ ├── requireAuth.js
 │ ├── .env
+│
+├── swagger/
+│ ├── index.html
+│ ├── css/
+│ │ ├── swagger-ui.css
+│ ├── js/
+│ │ ├── swagger-initializer.js
+│ │ ├── swagger-ui-bundle.js
+│ │ ├── swagger-ui-es-bundle-core.js
+│ │ ├── swagger-ui-es-bundle.js
+│ │ ├── swagger-ui-standalone-preset.js
+│ │ ├── swagger-ui.js
+│ │ ├── swagger-ui.js
 │
 └── README.md
 ```
@@ -144,6 +165,23 @@ npx eslint "src/**/*.{js,jsx}" --fix
 cd Server
 npx eslint "**/*.js" --fix
 ```
+
+## 📖 Documentation API (Swagger)
+
+Le projet inclut une documentation interactive de l’API grâce à **Swagger UI**.  
+Elle permet de tester directement les endpoints disponibles (CRUD Produits et Utilisateurs).
+
+### Accéder à la documentation
+
+Une fois le backend lancé, ouvre ton navigateur sur :  
+👉 [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+
+Tu y trouveras :
+- Les routes d’authentification (`/api/users/register`, `/api/users/login`).
+- Les routes Produits (`/api/product`, `/api/product/:id`).
+- Les détails des paramètres, schémas et réponses.
+
+Swagger se base sur le fichier `swagger/swagger.json` et est servi par le backend Express.
 
 ## 📌 Améliorations possibles
 
