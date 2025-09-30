@@ -10,14 +10,15 @@ const Product = require('./models/product'); // pour syncIndexes()
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
+/*
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   '127.0.0.1:3000',
   'http://localhost:8080',
   'https://radiant-alfajores-52e968.netlify.app', // site Netlify
-];
+]*/
 
+/*
 const corsOptions = {
   origin(origin, cb) {
     if (!origin) return cb(null, true); 
@@ -34,6 +35,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false, 
 };
+*/
 
 app.use(cors());
 

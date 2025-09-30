@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const { setupDB } = require('./setup');
 const Product = require('../models/product');
 const User = require('../models/user');

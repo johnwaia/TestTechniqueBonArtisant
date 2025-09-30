@@ -35,7 +35,7 @@ module.exports = async function requireAuth(req, res, next) {
 
     req.user = { id: userId };
     return next();
-  } catch (e) {
+  } catch {
     return res.status(401).json({ message: 'Token invalide' });
   }
 };

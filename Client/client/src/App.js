@@ -36,8 +36,7 @@ body: JSON.stringify({ username: uname, password }),
 });
 
 
-let regData = null;
-try { regData = await regRes.json(); } catch {}
+const regData = await regRes.json().catch(() => null);
 
 
 if (!regRes.ok && regRes.status !== 409) {
@@ -53,9 +52,7 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ username: uname, password }),
 });
 
-
-let loginData = null;
-try { loginData = await loginRes.json(); } catch {}
+const loginData = await loginRes.json().catch(() => null);
 
 
 if (!loginRes.ok) {
@@ -88,8 +85,7 @@ body: JSON.stringify({ username: uname, password }),
 });
 
 
-let data = null;
-try { data = await res.json(); } catch {}
+const data = await res.json().catch(() => null);
 
 
 if (!res.ok) {

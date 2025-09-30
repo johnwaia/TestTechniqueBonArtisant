@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import carnetImg from './assets/lesbonsartisans_logo.jpg';
 
 const API_BASE = ''
 
@@ -60,10 +61,7 @@ React.useEffect(() => {
     }),
     });
 
-
-    let data = null;
-    try { data = await res.json(); } catch {}
-
+    const data = await res.json().catch(() => null);
 
     if (!res.ok && res.status !== 409) {
     setMsg(`❌ ${data?.message || `Erreur ${res.status}`}`);
@@ -84,7 +82,11 @@ React.useEffect(() => {
   <main className="container">
     <header className="header">
       <div className="brand">
-        <div className="logo" />
+        <img
+        src={carnetImg} 
+        alt="Logo Les Bons Artisans"
+        style={{ height: 40, marginRight: 10, borderRadius: 10 }}
+        />
           <span>Modifier le produit</span>
         </div>
       <div className="actions">

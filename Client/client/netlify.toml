@@ -1,9 +1,0 @@
-[build]
-  base = "Client/client"        # chemin du projet React depuis la racine du repo
-  command = "npm run build"
-  publish = "build"              # Vite => "dist" ; CRA => "build"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

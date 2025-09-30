@@ -1,0 +1,19 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2021": true },
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "parserOptions": { "ecmaVersion": 2021, "sourceType": "module" },
+  "plugins": ["react", "react-hooks"],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "settings": { "react": { "version": "detect" } },
+  "overrides": [
+    {
+      "files": ["**/*.test.js", "**/__tests__/**/*.js"],
+      "env": { "jest": true, "node": true }
+    }
+  ]
+}

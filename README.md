@@ -76,6 +76,14 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 
 ![Produits screenshot](./docs/ajouter_produit.png)
 
+### Modifier des produits
+
+![Produits screenshot](./docs/modifier_produit.png)
+
+### Base de données MongoDB
+
+![Produits screenshot](./docs/bdd_mongoDB.png)
+
 ## ⚙️ Installation & Lancement
 
 ### 1. Cloner le projet
@@ -117,6 +125,25 @@ Le front est accessible sur http://localhost:3000
 Mots de passe hashés avec bcryptjs.
 Authentification protégée avec JWT.
 Routes API sécurisées : un token valide est nécessaire pour accéder aux produits.
+
+## ✨ Qualité du code
+
+L’ensemble du code respecte la norme définie par **ESLint**, garantissant :
+- une cohérence de style (indentation, guillemets, point-virgule, etc.),
+- la détection des variables inutilisées ou non définies,
+- le respect des bonnes pratiques modernes côté **frontend (React)** et **backend (Node/Express)**.
+
+Tu peux exécuter le linter pour vérifier ou corriger automatiquement :
+
+```bash
+# côté frontend
+cd Client
+npx eslint "src/**/*.{js,jsx}" --fix
+
+# côté backend
+cd Server
+npx eslint "**/*.js" --fix
+```
 
 ## 📌 Améliorations possibles
 
