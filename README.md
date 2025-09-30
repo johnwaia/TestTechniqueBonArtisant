@@ -58,6 +58,24 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 
 ---
 
+## Capture d'écran
+
+### Page de connexion
+
+![Login screenshot](./docs/ecran_acceuil.png)
+
+### Page d’accueil
+
+![Produits screenshot](./docs/page_acceuil.png)
+
+### Afficher les Produits de l'utilisateur.
+
+![Produits screenshot](./docs/affichage_produits.png)
+
+### Ajouter des produits
+
+![Produits screenshot](./docs/ajouter_produit.png)
+
 ## ⚙️ Installation & Lancement
 
 ### 1. Cloner le projet
