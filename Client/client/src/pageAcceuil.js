@@ -2,16 +2,12 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import carnetImg from './assets/carnet.png';
 
-const API_BASE = (
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
-  process.env.REACT_APP_API_BASE ||
-  'https://authentification-fullstack.onrender.com'
-).replace(/\/+$/, '');
+const API_BASE = ''
 
 export default function Welcome() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [contacts, setContacts] = React.useState([]);
+  const [products, setProducts] = React.useState([]);
 
   React.useEffect(() => {
     if (!localStorage.getItem('token')) {
@@ -19,10 +15,9 @@ export default function Welcome() {
     }
   }, [navigate]);
 
-  const username =
-    location.state?.username ||
-    localStorage.getItem('lastUsername') ||
-    'utilisateur';
+
+  const username = location.state?.username ||localStorage.getItem('lastUsername') || 'utilisateur';
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -30,99 +25,109 @@ export default function Welcome() {
     navigate('/', { replace: true });
   };
 
-  const handleAddContact = () => {
-    navigate('/addContact');
+
+  const handleAddProduct = () => {
+   navigate('/addProduct');
   };
 
-  const handleSeeContacts = async () => {
+
+  const handleSeeProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/contact`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetch(`${API_BASE}/api/product`, {
+      headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Erreur lors de la récupération des contacts');
+      if (!response.ok) throw new Error('Erreur lors de la récupération des produits');
       const data = await response.json();
-      setContacts(data);
+      setProducts(data);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleDeleteContact = async (id) => {
+
+  const handleDeleteProduct = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/contact/${id}`, {
+      const response = await fetch(`${API_BASE}/api/product/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Erreur lors de la suppression du contact');
-      setContacts((prev) => prev.filter((contact) => (contact._id || contact.id) !== id));
+      if (!response.ok) throw new Error('Erreur lors de la suppression du produit');
+        setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id));
     } catch (error) {
-      console.error(error);
+    console.error(error);
     }
   };
 
-  const handleEditContact = (id) => {
-    navigate(`/editContact/${id}`);
+  const handleEditProduct = (id) => {
+  navigate(`/editProduct/${id}`);
   };
-
 
   return (
     <main className="container">
       <header className="header">
-        <div className="brand">
-          <img
-            src={carnetImg}
-            alt="Carnet de contacts"
-            className="brand-logo"
-          />
-        </div>
-        <span className="brand-text">Mon carnet de contacts</span>
-        <div className="actions">
-          <button onClick={handleAddContact} className="btn btn-primary">Ajouter un contact</button>
-          <button onClick={handleSeeContacts} className="btn">Voir mes contacts</button>
-          <button onClick={handleLogout} className="btn btn-ghost">Déconnexion</button>
-        </div>
+      <div className="brand">
+      <img
+      src={carnetImg}
+      alt="Catalogue produits"
+      className="brand-logo"
+      />
+      </div>
+      <span className="brand-text">Mes produits</span>
+      <div className="actions">
+      <button onClick={handleAddProduct} className="btn btn-primary">Ajouter un produit</button>
+      <button onClick={handleSeeProducts} className="btn">Voir mes produits</button>
+      <button onClick={handleLogout} className="btn btn-ghost">Déconnexion</button>
+      </div>
       </header>
 
-      <section className="card">
-        <div style={{marginBottom:8}}>Bienvenue, <strong>{username}</strong> !</div>
 
-        {contacts.length > 0 ? (
-          <div className="table-wrap" role="region" aria-label="Liste de contacts">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Prénom</th>
-                  <th>Téléphone</th>
-                  <th style={{width:180}}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {contacts.map((c) => {
-                  const id = c._id || c.id;
-                  return (
-                    <tr key={id}>
-                      <td>{c.contactname}</td>
-                      <td>{c.contactFirstname}</td>
-                      <td>{c.contactPhone}</td>
-                      <td>
-                        <div className="actions">
-                          <button onClick={() => handleEditContact(id)} className="btn">Modifier</button>
-                          <button onClick={() => handleDeleteContact(id)} className="btn btn-danger">Supprimer</button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="msg">Clique sur <em>“Voir mes contacts”</em> pour charger ta liste.</div>
-        )}
-      </section>
+    <section className="card">
+    <div style={{marginBottom:8}}>Bienvenue, <strong>{username}</strong> !</div>
+
+
+    {products.length > 0 ? (
+    <div className="table-wrap" role="region" aria-label="Liste de produits">
+    <table>
+    <thead>
+    <tr>
+    <th>Nom</th>
+    <th>Type</th>
+    <th>Prix</th>
+    <th>Note</th>
+    <th>Garantie (ans)</th>
+    <th>Dispo</th>
+    <th style={{width:180}}>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {products.map((p) => {
+    const id = p._id || p.id;
+    return (
+    <tr key={id}>
+    <td>{p.name}</td>
+    <td>{p.type}</td>
+    <td>{p.price}</td>
+    <td>{p.rating ?? '-'}</td>
+    <td>{p.warranty_years ?? '-'}</td>
+    <td>{p.available ? '✅' : '❌'}</td>
+    <td>
+    <div className="actions">
+    <button onClick={() => handleEditProduct(id)} className="btn">Modifier</button>
+    <button onClick={() => handleDeleteProduct(id)} className="btn btn-danger">Supprimer</button>
+    </div>
+    </td>
+    </tr>
+    );
+    })}
+    </tbody>
+    </table>
+    </div>
+    ) : (
+    <div className="msg">Clique sur <em>“Voir mes produits”</em> pour charger ta liste.</div>
+    )}
+    </section>
     </main>
   );
 }

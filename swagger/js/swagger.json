@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "API Gestion Contacts",
+    "title": "API Gestion Produits",
     "version": "1.0.0",
-    "description": "API d’authentification et de gestion de contacts (JWT + MongoDB)."
+    "description": "API d’authentification et de gestion de produits (JWT + MongoDB)."
   },
   "servers": [
     {
@@ -13,7 +13,7 @@
   ],
   "tags": [
     { "name": "Utilisateurs", "description": "Inscription et connexion" },
-    { "name": "Contacts", "description": "CRUD Contacts (routes protégées)" }
+    { "name": "Produits", "description": "CRUD Produits (routes protégées)" }
   ],
   "paths": {
     "/api/users/register": {
@@ -83,19 +83,19 @@
       }
     },
 
-    "/api/contact": {
+    "/api/product": {
       "get": {
-        "tags": ["Contacts"],
-        "summary": "Lister les contacts de l’utilisateur connecté",
+        "tags": ["Produits"],
+        "summary": "Lister les produits de l’utilisateur connecté",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "Liste des contacts",
+            "description": "Liste des produits",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/Contact" }
+                  "items": { "$ref": "#/components/schemas/Product" }
                 }
               }
             }
@@ -105,20 +105,23 @@
         }
       },
       "post": {
-        "tags": ["Contacts"],
-        "summary": "Créer un contact",
+        "tags": ["Produits"],
+        "summary": "Créer un produit",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ContactCreate" },
+              "schema": { "$ref": "#/components/schemas/ProductCreate" },
               "examples": {
                 "default": {
                   "value": {
-                    "contactname": "Doe",
-                    "contactFirstname": "John",
-                    "contactPhone": "+33600000000"
+                    "name": "AC1 Phone1",
+                    "type": "phone",
+                    "price": 200.05,
+                    "rating": 3.8,
+                    "warranty_years": 1,
+                    "available": true
                   }
                 }
               }
@@ -127,25 +130,25 @@
         },
         "responses": {
           "201": {
-            "description": "Contact créé",
+            "description": "Produit créé",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ContactCreatedResponse" }
+                "schema": { "$ref": "#/components/schemas/ProductCreatedResponse" }
               }
             }
           },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "description": "Non authentifié" },
-          "409": { "description": "Contact déjà existant (même nom pour cet utilisateur)" },
+          "409": { "description": "Produit déjà existant (même nom pour cet utilisateur)" },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       }
     },
 
-    "/api/contact/{id}": {
+    "/api/product/{id}": {
       "get": {
-        "tags": ["Contacts"],
-        "summary": "Obtenir un contact par ID",
+        "tags": ["Produits"],
+        "summary": "Obtenir un produit par ID",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -153,26 +156,26 @@
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "ID du contact"
+            "description": "ID du produit"
           }
         ],
         "responses": {
           "200": {
-            "description": "Contact trouvé",
+            "description": "Produit trouvé",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Contact" }
+                "schema": { "$ref": "#/components/schemas/Product" }
               }
             }
           },
           "401": { "description": "Non authentifié" },
-          "404": { "description": "Contact non trouvé" },
+          "404": { "description": "Produit non trouvé" },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       },
       "patch": {
-        "tags": ["Contacts"],
-        "summary": "Modifier un contact",
+        "tags": ["Produits"],
+        "summary": "Modifier un produit",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -180,20 +183,19 @@
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "ID du contact"
+            "description": "ID du produit"
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ContactUpdate" },
+              "schema": { "$ref": "#/components/schemas/ProductUpdate" },
               "examples": {
                 "default": {
                   "value": {
-                    "contactname": "Doe",
-                    "contactFirstname": "Jane",
-                    "contactPhone": "+33711111111"
+                    "price": 149.99,
+                    "available": false
                   }
                 }
               }
@@ -202,22 +204,23 @@
         },
         "responses": {
           "200": {
-            "description": "Contact modifié",
+            "description": "Produit modifié",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ContactCreatedResponse" }
+                "schema": { "$ref": "#/components/schemas/ProductCreatedResponse" }
               }
             }
           },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "description": "Non authentifié" },
-          "404": { "description": "Contact non trouvé" },
+          "404": { "description": "Produit non trouvé" },
+          "409": { "description": "Conflit d’unicité (nom déjà utilisé)" },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       },
       "delete": {
-        "tags": ["Contacts"],
-        "summary": "Supprimer un contact",
+        "tags": ["Produits"],
+        "summary": "Supprimer un produit",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -225,25 +228,25 @@
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "ID du contact"
+            "description": "ID du produit"
           }
         ],
         "responses": {
           "200": {
-            "description": "Contact supprimé",
+            "description": "Produit supprimé",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": { "type": "string", "example": "Contact supprimé" }
+                    "message": { "type": "string", "example": "Produit supprimé" }
                   }
                 }
               }
             }
           },
           "401": { "description": "Non authentifié" },
-          "404": { "description": "Contact non trouvé" },
+          "404": { "description": "Produit non trouvé" },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       }
@@ -345,43 +348,54 @@
         }
       },
 
-      "Contact": {
+      "Product": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "contactname": { "type": "string" },
-          "contactFirstname": { "type": "string" },
-          "contactPhone": { "type": "string" },
-          "createdby": { "type": "string" },
+          "_id": { "type": "string", "example": "66f1c5b1e8e3a4a9b6a1d234" },
+          "name": { "type": "string", "example": "AC1 Phone1" },
+          "type": { "type": "string", "example": "phone" },
+          "price": { "type": "number", "format": "double", "example": 200.05 },
+          "rating": { "type": "number", "format": "double", "example": 3.8 },
+          "warranty_years": { "type": "integer", "example": 1 },
+          "available": { "type": "boolean", "example": true },
+          "createdby": { "type": "string", "example": "66f1c5b1e8e3a4a9b6a1d999" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }
       },
-      "ContactCreate": {
+      "ProductCreate": {
         "type": "object",
-        "required": ["contactname", "contactFirstname", "contactPhone"],
+        "required": ["name", "type", "price"],
         "properties": {
-          "contactname": { "type": "string", "minLength": 3, "maxLength": 30 },
-          "contactFirstname": { "type": "string" },
-          "contactPhone": { "type": "string" }
+          "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+          "type": { "type": "string", "minLength": 1, "maxLength": 50 },
+          "price": { "type": "number", "format": "double" },
+          "rating": { "type": "number", "format": "double" },
+          "warranty_years": { "type": "integer" },
+          "available": { "type": "boolean" }
         }
       },
-      "ContactUpdate": {
+      "ProductUpdate": {
         "type": "object",
-        "required": ["contactname", "contactFirstname", "contactPhone"],
         "properties": {
-          "contactname": { "type": "string" },
-          "contactFirstname": { "type": "string" },
-          "contactPhone": { "type": "string" }
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "price": { "type": "number", "format": "double" },
+          "rating": { "type": "number", "format": "double" },
+          "warranty_years": { "type": "integer" },
+          "available": { "type": "boolean" }
         }
       },
-      "ContactCreatedResponse": {
+      "ProductCreatedResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "contactname": { "type": "string" },
-          "contactFirstname": { "type": "string" },
-          "contactPhone": { "type": "string" },
+          "id": { "type": "string", "example": "66f1c5b1e8e3a4a9b6a1d234" },
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "price": { "type": "number", "format": "double" },
+          "rating": { "type": "number", "format": "double" },
+          "warranty_years": { "type": "integer" },
+          "available": { "type": "boolean" },
           "createdAt": { "type": "string", "format": "date-time" }
         }
       }
