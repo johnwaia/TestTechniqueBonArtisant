@@ -1,32 +1,33 @@
-# 📇 Gestion de Contacts avec Authentification
+# 📦 Gestion de Produits avec Authentification
 
 Application MERN (MongoDB, Express, React, Node.js) permettant :
-- L'inscription et connexion d’utilisateurs (avec JWT).
-- L’ajout, la modification, la suppression et la consultation de contacts personnels.
-- Une interface simple en React avec gestion de session via `localStorage`.
+- L'inscription et la connexion d’utilisateurs (avec JWT).
+- L’ajout, la modification, la suppression et la consultation de produits personnels.
+- Une interface React moderne avec Material UI, gestion de session via `localStorage`.
 
 ---
 
 ## 🚀 Fonctionnalités
 
-### Frontend (React)
+### Frontend (React + Material UI)
 - **Page d’authentification** : inscription + connexion utilisateur.
-- **Page d’accueil** : bienvenue + gestion des contacts.
-- **Ajout de contact** : formulaire avec nom, prénom, téléphone.
-- **Modification de contact** : édition des informations existantes.
-- **Suppression de contact** : retrait immédiat de la liste.
+- **Page d’accueil** : bienvenue + gestion des produits.
+- **Ajout de produit** : formulaire avec nom, type, prix, note, garantie, disponibilité.
+- **Modification de produit** : édition des informations existantes.
+- **Suppression de produit** : retrait immédiat de la liste.
 - **Déconnexion** : suppression du token JWT du `localStorage`.
+- **UI moderne avec Material UI** (AppBar, Button, Table, Alert, Snackbar…).
 
 ### Backend (Express / MongoDB)
 - **Authentification sécurisée** avec `bcrypt` et `jsonwebtoken`.
-- **Middleware requireAuth** : protège toutes les routes de contacts.
-- **CRUD contacts** :
-  - `POST /api/contact` → créer un contact.
-  - `GET /api/contact` → récupérer tous les contacts de l’utilisateur.
-  - `PATCH /api/contact/:id` → modifier un contact.
-  - `DELETE /api/contact/:id` → supprimer un contact.
-  - `GET /api/contact/:id` → récupérer un contact spécifique.
-- **CRUD utilisateurs** :
+- **Middleware requireAuth** : protège toutes les routes de produits.
+- **CRUD Produits** :
+  - `POST /api/product` → créer un produit.
+  - `GET /api/product` → récupérer tous les produits de l’utilisateur.
+  - `PATCH /api/product/:id` → modifier un produit.
+  - `DELETE /api/product/:id` → supprimer un produit.
+  - `GET /api/product/:id` → récupérer un produit spécifique.
+- **CRUD Utilisateurs** :
   - `POST /api/users/register` → inscription.
   - `POST /api/users/login` → connexion (retourne un token JWT).
 
@@ -34,92 +35,73 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 
 ## 📂 Structure du projet
 ```
-├── Client/client
+├── Client/
 │ ├── App.js
 │ ├── pageAcceuil.js
-│ ├── addContact.js
-│ ├── editContact.js
+│ ├── addProduct.js
+│ ├── editProduct.js
 │
 ├── server/
 │ ├── server.js
 │ ├── routes/
 │ │ ├── users.js
-│ │ ├── contacts.js
+│ │ ├── products.js
 │ ├── models/
 │ │ ├── user.js
-│ │ ├── contact.js
+│ │ ├── product.js
 │ ├── middleware/
 │ │ ├── requireAuth.js
 │ ├── .env
 │
 └── README.md
-``` 
+```
 
 ---
 
 ## ⚙️ Installation & Lancement
 
 ### 1. Cloner le projet
+
 ```bash
-git clone
+git clone https://github.com/johnwaia/TestTechniqueBonArtisant.git
 ```
 
-### 2. Lancer le server
+### 2. lancer le backend
+
 ```bash
-cd backend
+cd server
 npm install
+npm start
 ```
 
-#### Créer un fichier .env à la racine du backend avec :
-```
-MONGO_URI=mongodb://localhost:27017/contactapp
-JWT_SECRET=tonsecretjwt
-PORT=5000
-```
-## Lancer l’application
+#### Créer un fichier .env dans server :
 
-### Backend
-
-Depuis le dossier backend :
+ce sont les vrais variables d'environement pour pouvoir tester sans problème.
 ```bash
+MONGO_URI=mongodb+srv://appuser:test12345678@cluster0.ccv4wnj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=une_chaine_longue_et_secrete_change_moi
+```
+
+### 3.Lancer le frontend
+
+```bash
+cd Client
+npm install
 npm start
 ```
 
-Par défaut, le serveur écoute sur http://localhost:5000.
-
-### Frontend
-
-Depuis la racine du projet :
-```
-npm start
-
-```
-
-L’application s’ouvre sur http://localhost:3000
-.
+Par défaut :
+Le serveur écoute sur http://localhost:5000
+Le front est accessible sur http://localhost:3000
 
 ## 🔒 Sécurité
 
-Les mots de passe sont hashés avec bcryptjs.
-
-L’authentification est protégée avec JWT.
-
-Les routes API nécessitent un token valide pour accéder aux contacts.
+Mots de passe hashés avec bcryptjs.
+Authentification protégée avec JWT.
+Routes API sécurisées : un token valide est nécessaire pour accéder aux produits.
 
 ## 📌 Améliorations possibles
 
-Validation plus avancée côté frontend (format téléphone, etc.).
-
-Ajout de tests unitaires (Jest / Mocha).
-
-Pagination et recherche dans la liste des contacts.
-
-Déploiement (Heroku, Render, Vercel, etc.).
-
-## 👨‍💻 Auteur
-
-Projet développé à titre d’apprentissage (React, Node.js, Express, MongoDB).
-
-
-
-
+Validation avancée côté frontend (prix > 0, note entre 0–5, etc.).
+Pagination, tri et recherche sur la liste des produits.
+Déploiement (Render, Netlify, Vercel, etc.).

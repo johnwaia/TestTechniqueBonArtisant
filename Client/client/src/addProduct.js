@@ -1,163 +1,83 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import confetti from 'canvas-confetti';
-import carnetImg from './assets/carnet.png';
-
-const API_BASE = ''
+import {
+  Container, Paper, Stack, TextField, Button, Checkbox, FormControlLabel, Typography, Alert
+} from '@mui/material';
 
 export default function AddProduct() {
-const [name, setName] = React.useState('');
-const [type, setType] = React.useState('');
-const [price, setPrice] = React.useState('');
-const [rating, setRating] = React.useState('');
-const [warrantyYears, setWarrantyYears] = React.useState('');
-const [available, setAvailable] = React.useState(true);
-const [msg, setMsg] = React.useState('');
-const navigate = useNavigate();
+  const [name, setName] = React.useState('');
+  const [type, setType] = React.useState('');
+  const [price, setPrice] = React.useState('');
+  const [rating, setRating] = React.useState('');
+  const [warrantyYears, setWarrantyYears] = React.useState('');
+  const [available, setAvailable] = React.useState(true);
+  const [msg, setMsg] = React.useState('');
+  const navigate = useNavigate();
 
+  const API_BASE = ''; // grâce au proxy CRA
 
-const handleRegisterProduct = async (e) => {
-e.preventDefault();
-setMsg('Envoi...');
+  const handleRegisterProduct = async (e) => {
+    e.preventDefault();
+    setMsg('Envoi...');
 
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/product`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          name: name.trim(),
+          type: type.trim(),
+          price: parseFloat(price),
+          rating: rating === '' ? undefined : parseFloat(rating),
+          warranty_years: warrantyYears === '' ? undefined : parseInt(warrantyYears, 10),
+          available,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return setMsg(`❌ ${data?.message || `Erreur ${res.status}`}`);
+      setMsg(`✅ Produit créé : ${data.name}`);
+    } catch {
+      setMsg('❌ Erreur réseau');
+    }
+  };
 
-try {
-const token = localStorage.getItem('token');
-const res = await fetch(`${API_BASE}/api/product`, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json',
-Authorization: `Bearer ${token}`,
-},
-body: JSON.stringify({
-name: name.trim(),
-type: type.trim(),
-price: parseFloat(price),
-rating: rating === '' ? undefined : parseFloat(rating),
-warranty_years: warrantyYears === '' ? undefined : parseInt(warrantyYears, 10),
-available,
-}),
-});
+  return (
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>Créer un produit</Typography>
+        <Stack component="form" spacing={2} onSubmit={handleRegisterProduct}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField label="Nom" value={name} onChange={e => setName(e.target.value)} required fullWidth />
+            <TextField label="Type" value={type} onChange={e => setType(e.target.value)} required fullWidth />
+          </Stack>
 
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField label="Prix" type="number" inputProps={{ step: '0.01', min: 0 }}
+              value={price} onChange={e => setPrice(e.target.value)} required fullWidth />
+            <TextField label="Note (0-5)" type="number" inputProps={{ step: '0.1', min: 0, max: 5 }}
+              value={rating} onChange={e => setRating(e.target.value)} fullWidth />
+          </Stack>
 
-let data = null;
-try { data = await res.json(); } catch {}
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+            <TextField label="Garantie (années)" type="number" inputProps={{ min: 0 }}
+              value={warrantyYears} onChange={e => setWarrantyYears(e.target.value)} fullWidth />
+            <FormControlLabel
+              control={<Checkbox checked={available} onChange={e => setAvailable(e.target.checked)} />}
+              label="Disponible"
+            />
+          </Stack>
 
+          <Stack direction="row" spacing={2}>
+            <Button type="submit" variant="contained">Créer</Button>
+            <Button variant="outlined" onClick={() => navigate(-1)}>Retour</Button>
+          </Stack>
 
-if (!res.ok) {
-setMsg(`❌ ${data?.message || `Erreur ${res.status}`}`);
-return;
-}
-
-
-setMsg(`✅ Produit créé : ${data.name}`);
-confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-} catch {
-setMsg('❌ Erreur réseau. Vérifie que le serveur tourne.');
-}
-};
-
-
-const isError = msg.startsWith('❌');
-const isSuccess = msg.startsWith('✅');
-
-return (
-<main className="container">
-<header className="header">
-<div className="brand">
-<img src={carnetImg} alt="Catalogue produits" className="brand-logo" />
-</div>
-<span className="brand-text">Créer un produit</span>
-<div className="actions">
-<button type="button" onClick={() => navigate(-1)} className="btn">Retour</button>
-</div>
-</header>
-
-
-<section className="card">
-<form onSubmit={handleRegisterProduct} className="form">
-<div className="row">
-<input
-id="name"
-placeholder="Nom"
-value={name}
-onChange={(e) => setName(e.target.value)}
-required
-minLength={2}
-className="input"
-autoFocus
-/>
-<input
-id="type"
-placeholder="Type (ex: phone)"
-value={type}
-onChange={(e) => setType(e.target.value)}
-required
-className="input"
-/>
-</div>
-
-
-<div className="row">
-<input
-id="price"
-type="number"
-step="0.01"
-min="0"
-placeholder="Prix"
-value={price}
-onChange={(e) => setPrice(e.target.value)}
-required
-className="input"
-/>
-<input
-id="rating"
-type="number"
-step="0.1"
-min="0"
-max="5"
-placeholder="Note (0-5)"
-value={rating}
-onChange={(e) => setRating(e.target.value)}
-className="input"
-/>
-</div>
-
-
-<div className="row">
-<input
-id="warranty_years"
-type="number"
-min="0"
-placeholder="Garantie (années)"
-value={warrantyYears}
-onChange={(e) => setWarrantyYears(e.target.value)}
-className="input"
-/>
-<label className="checkbox">
-<input
-type="checkbox"
-checked={available}
-onChange={(e) => setAvailable(e.target.checked)}
-/>
-Disponible
-</label>
-</div>
-
-
-<div className="actions">
-<button type="submit" className="btn btn-primary">Créer le produit</button>
-<button type="button" onClick={() => navigate(-1)} className="btn">Retour</button>
-</div>
-
-
-{msg && (
-<div className={`msg ${isError ? 'error' : ''} ${isSuccess ? 'success' : ''}`}>
-{msg}
-</div>
-)}
-</form>
-</section>
-</main>
-);
+          {msg && (
+            <Alert severity={msg.startsWith('❌') ? 'error' : 'success'}>{msg}</Alert>
+          )}
+        </Stack>
+      </Paper>
+    </Container>
+  );
 }
