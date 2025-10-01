@@ -20,7 +20,7 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 - **Suppression de produit** : retrait immédiat de la liste.
 - **Déconnexion** : suppression du token JWT du `localStorage`.
 - **UI moderne avec Material UI** (AppBar, Button, Table, Alert, Snackbar…).
-**Redux Toolkit** :
+- **Redux Toolkit** :
   - Centralise l’état de l’application (utilisateur connecté, liste des produits).
   - Synchronise automatiquement les produits entre toutes les pages.
   - Gère les actions déclenchées par WebSocket (ajout, modification, suppression) pour que l’interface se mette à jour en temps réel partout.
@@ -189,9 +189,9 @@ Le front est accessible sur http://localhost:3000
 
 ## 🔒 Sécurité
 
-Mots de passe hashés avec bcryptjs.
-Authentification protégée avec JWT.
-Routes API sécurisées : un token valide est nécessaire pour accéder aux produits.
+- Mots de passe hashés avec bcryptjs.
+- Authentification protégée avec JWT.
+- Routes API sécurisées : un token valide est nécessaire pour accéder aux produits.
 
 ## ✨ Qualité du code
 
