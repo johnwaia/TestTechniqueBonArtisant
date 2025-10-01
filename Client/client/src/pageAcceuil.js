@@ -1,9 +1,13 @@
-// src/pageAcceuil.js
+// Client/pageAcceuil.js
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-// Material UI
+// 🔹 Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { setProducts, upsertProduct, removeProduct } from './store/productsSlice';
+import { clearAuth } from './store/authSlice';
+
 import {
   AppBar, Toolbar, Typography, Button, Container, Paper, Stack, Box,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Alert, Snackbar
@@ -14,33 +18,39 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import carnetImg from './assets/carnet.png';
+import carnetImg from './assets/lesbonsartisans_logo.jpg';
 
-const API_BASE = ''; // proxy CRA ⇒ /api/... ira vers http://localhost:5000
+const API_BASE = '';
 
 export default function Welcome() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [products, setProducts] = React.useState([]);
+  const dispatch = useDispatch();
+
+  // 🔹 produits depuis Redux
+  const products = useSelector(state => state.products.items);
+  const { token, username: usernameStore } = useSelector(state => state.auth);
+
   const [msg, setMsg] = React.useState('');
   const [snackOpen, setSnackOpen] = React.useState(false);
   const socketRef = React.useRef(null);
 
   // Redirection si non authentifié
   React.useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    if (!token) {
       navigate('/', { replace: true });
     }
-  }, [navigate]);
+  }, [token, navigate]);
 
   const username =
     location.state?.username ||
+    usernameStore ||
     localStorage.getItem('lastUsername') ||
     'utilisateur';
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('lastUsername');
+    // 🔹 nettoie Redux (et localStorage via slice)
+    dispatch(clearAuth());
     navigate('/', { replace: true });
   };
 
@@ -48,16 +58,15 @@ export default function Welcome() {
     navigate('/addProduct');
   };
 
-  // Charger TOUS les produits
   const handleSeeProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE}/api/product`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la récupération des produits');
       const data = await response.json();
-      setProducts(data);
+      // 🔹 pousse dans Redux
+      dispatch(setProducts(data));
       setMsg('');
     } catch (error) {
       console.error(error);
@@ -68,14 +77,13 @@ export default function Welcome() {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE}/api/product/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression du produit');
-      // La suppression arrivera aussi via l’event socket, mais on met à jour localement pour réactivité
-      setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id));
+      // Mise à jour locale immédiate (l’event socket arrivera aussi)
+      dispatch(removeProduct(id));
       setMsg('✅ Produit supprimé');
       setSnackOpen(true);
     } catch (error) {
@@ -89,34 +97,34 @@ export default function Welcome() {
     navigate(`/editProduct/${id}`);
   };
 
+  // Socket.IO : temps réel (création / modification / suppression)
   React.useEffect(() => {
-    if (!localStorage.getItem('token')) return undefined;
-    const socket = io('http://localhost:5000', { transports: ['websocket'] });
+    if (!token) return undefined;
+    const socket = io('http://localhost:5000', { transports: ['websocket', 'polling'] });
     socketRef.current = socket;
 
     socket.on('productUpdated', ({ product, actor }) => {
-      setProducts(prev => prev.map(p => ((p._id || p.id) === product._id ? product : p)));
+      dispatch(upsertProduct(product));
       setMsg(`🟡 ${actor?.username || 'Un utilisateur'} a modifié « ${product.name} »`);
       setSnackOpen(true);
     });
 
     socket.on('productDeleted', ({ id, actor }) => {
-      setProducts(prev => prev.filter(p => (p._id || p.id) !== id));
+      dispatch(removeProduct(id));
       setMsg(`🔴 ${actor?.username || 'Un utilisateur'} a supprimé un produit`);
       setSnackOpen(true);
     });
 
     socket.on('productCreated', ({ product, actor }) => {
-      setProducts(prev => (prev.some(p => (p._id || p.id) === product._id) ? prev : [product, ...prev]));
+      dispatch(upsertProduct(product));
       setMsg(`🟢 ${actor?.username || 'Un utilisateur'} a ajouté « ${product.name} »`);
       setSnackOpen(true);
     });
 
-
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [token, dispatch]);
 
   return (
     <>

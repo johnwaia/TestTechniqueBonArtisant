@@ -1,18 +1,24 @@
-// src/editProduct.js
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-// Material UI
+import { useDispatch, useSelector } from 'react-redux';
+import { upsertProduct } from './store/productsSlice';
+
+// MUI
 import {
   Container, Paper, Stack, TextField, Button, Checkbox, FormControlLabel,
   Typography, Snackbar, Alert
 } from '@mui/material';
 
-const API_BASE = ''; // grâce au proxy CRA, /api/... ira vers http://localhost:5000
+const API_BASE = ''; // proxy CRA → /api/* vers http://localhost:5000
 
 export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const token = useSelector(s => s.auth.token);
 
   const [name, setName] = React.useState('');
   const [type, setType] = React.useState('');
@@ -23,17 +29,17 @@ export default function EditProduct() {
 
   const [snack, setSnack] = React.useState({ open: false, msg: '', severity: 'info' });
 
-
+  // Redirection si non authentifié
   React.useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    if (!token) {
       navigate('/', { replace: true });
     }
-  }, [navigate]);
+  }, [token, navigate]);
 
+  // Charger le produit par ID
   React.useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE}/api/product/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -55,14 +61,13 @@ export default function EditProduct() {
       }
     };
 
-    if (id) fetchProduct();
-  }, [id]);
+    if (id && token) fetchProduct();
+  }, [id, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE}/api/product/${id}`, {
         method: 'PATCH',
         headers: {
@@ -88,6 +93,14 @@ export default function EditProduct() {
           severity: 'error',
         });
         return;
+      }
+
+      const refRes = await fetch(`${API_BASE}/api/product/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (refRes.ok) {
+        const full = await refRes.json();
+        dispatch(upsertProduct(full));
       }
 
       setSnack({

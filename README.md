@@ -5,6 +5,8 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 - L’ajout, la modification, la suppression et la consultation de produits personnels.
 - Une interface React moderne avec Material UI, gestion de session via `localStorage`.
 - 📡 Notifications en temps réel grâce à **WebSocket (Socket.IO)**.
+- 🗂️ État global géré avec **Redux Toolkit**.
+
 
 ---
 
@@ -18,6 +20,11 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 - **Suppression de produit** : retrait immédiat de la liste.
 - **Déconnexion** : suppression du token JWT du `localStorage`.
 - **UI moderne avec Material UI** (AppBar, Button, Table, Alert, Snackbar…).
+**Redux Toolkit** :
+  - Centralise l’état de l’application (utilisateur connecté, liste des produits).
+  - Synchronise automatiquement les produits entre toutes les pages.
+  - Gère les actions déclenchées par WebSocket (ajout, modification, suppression) pour que l’interface se mette à jour en temps réel partout.
+- **Notifications temps réel** : affichées via MUI `Snackbar`/`Alert`.
 
 ### Backend (Express / MongoDB + Socket.IO)
 - **Authentification sécurisée** avec `bcrypt` et `jsonwebtoken`.
@@ -39,7 +46,17 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 
 ## 📡 Notifications en temps réel (WebSocket)
 
-Le projet utilise **Socket.IO** pour mettre à jour automatiquement tous les utilisateurs connectés lorsqu’un produit est modifié.  
+Le projet utilise **Socket.IO** pour garder les produits synchronisés entre tous les utilisateurs connectés.  
+Grâce à **Redux Toolkit**, les événements reçus sont directement dispatchés dans le store, ce qui met à jour toutes les pages automatiquement.
+
+Exemple :
+- Un utilisateur modifie un produit → le serveur émet `productUpdated`.
+- Le client reçoit l’événement et exécute : 
+  ```js
+  dispatch(upsertProduct(product));
+  ```
+
+Le produit est mis à jour dans le store Redux → la table des produits se met à jour instantanément pour tout le monde.
 
 - Côté **serveur**, après une action CRUD sur un produit, un événement est émis :
   ```js
