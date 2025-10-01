@@ -77,7 +77,7 @@ Ainsi, toutes les sessions actives restent synchronisées en temps réel et affi
 
 ## 📂 Structure du projet
 ```
-├── Client/
+├── Client/client
 │ ├── App.js
 │ ├── pageAcceuil.js
 │ ├── addProduct.js
@@ -178,7 +178,7 @@ JWT_SECRET=une_chaine_longue_et_secrete_change_moi
 ### 3.Lancer le frontend
 
 ```bash
-cd Client
+cd Client\client
 npm install
 npm start
 ```
