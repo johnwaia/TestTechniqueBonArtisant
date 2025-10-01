@@ -3,7 +3,6 @@ const Product = require('../models/product');
 const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
-
 router.use(requireAuth);
 
 router.post('/product', async (req, res) => {
@@ -18,16 +17,20 @@ router.post('/product', async (req, res) => {
     if (!name || !type || Number.isNaN(price)) {
       return res.status(400).json({ message: 'Données manquantes ou invalides (name, type, price requis)' });
     }
-    if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-
-    const exists = await Product.findOne({ name, createdby: req.user.id });
-    if (exists) return res.status(409).json({ message: 'Ce produit existe déjà' });
 
     const product = await Product.create({
       name, type, price, rating, warranty_years, available,
       createdby: req.user.id,
     });
 
+    const populated = await Product.findById(product._id)
+      .populate({ path: 'createdby', select: 'username' });
+
+    const io = req.app.get('io');
+    io?.emit('productCreated', {
+      product: populated, 
+      actor: { id: req.user.id, username: req.user.username }  // ✅
+    });
     return res.status(201).json({
       id: product._id,
       name: product.name,
@@ -46,10 +49,9 @@ router.post('/product', async (req, res) => {
 
 router.get('/product', async (req, res) => {
   try {
-    if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-
-    // tri récent d’abord, comme tes contacts
-    const products = await Product.find({ createdby: req.user.id }).sort({ createdAt: -1 });
+    const products = await Product.find({})
+      .sort({ createdAt: -1 })
+      .populate({ path: 'createdby', select: 'username' });
     return res.status(200).json(products);
   } catch (err) {
     console.error('Erreur GET /product :', err);
@@ -59,9 +61,12 @@ router.get('/product', async (req, res) => {
 
 router.get('/product/:id', async (req, res) => {
   try {
-    if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-    const product = await Product.findOne({ _id: req.params.id, createdby: req.user.id });
+    const product = await Product.findById(req.params.id)
+      .populate({ path: 'createdby', select: 'username' });
+
     if (!product) return res.status(404).json({ message: 'Produit non trouvé' });
+
+    // renvoie le document complet (tel que la liste) pour cohérence avec le front
     return res.status(200).json(product);
   } catch (err) {
     console.error('Erreur GET /product/:id :', err);
@@ -79,14 +84,22 @@ router.patch('/product/:id', async (req, res) => {
     if (req.body?.warranty_years !== undefined) payload.warranty_years = Number(req.body.warranty_years);
     if (req.body?.available !== undefined) payload.available = Boolean(req.body.available);
 
-    if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-
-    const product = await Product.findOneAndUpdate(
-      { _id: req.params.id, createdby: req.user.id },
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
       payload,
       { new: true, runValidators: true }
     );
     if (!product) return res.status(404).json({ message: 'Produit non trouvé' });
+
+    const populated = await Product.findById(product._id)
+      .populate({ path: 'createdby', select: 'username' });
+
+    // 🔔 notifier tous les clients
+    const io = req.app.get('io');
+    io?.emit('productUpdated', {
+      product: populated,
+      actor: { id: req.user.id, username: req.user.username }  // ✅
+    });
 
     return res.status(200).json({
       id: product._id,
@@ -107,9 +120,15 @@ router.patch('/product/:id', async (req, res) => {
 
 router.delete('/product/:id', async (req, res) => {
   try {
-    if (!req.user?.id) return res.status(401).json({ message: 'Non authentifié' });
-    const product = await Product.findOneAndDelete({ _id: req.params.id, createdby: req.user.id });
+    const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Produit non trouvé' });
+
+    const io = req.app.get('io');
+    io?.emit('productDeleted', {
+      id: req.params.id,
+      actor: { id: req.user.id, username: req.user.username }  // ✅
+    });
+
     return res.status(200).json({ message: 'Produit supprimé' });
   } catch (err) {
     console.error('Erreur DELETE /product/:id :', err);

@@ -4,6 +4,7 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 - L'inscription et la connexion d’utilisateurs (avec JWT).
 - L’ajout, la modification, la suppression et la consultation de produits personnels.
 - Une interface React moderne avec Material UI, gestion de session via `localStorage`.
+- 📡 Notifications en temps réel grâce à **WebSocket (Socket.IO)**.
 
 ---
 
@@ -18,20 +19,44 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 - **Déconnexion** : suppression du token JWT du `localStorage`.
 - **UI moderne avec Material UI** (AppBar, Button, Table, Alert, Snackbar…).
 
-### Backend (Express / MongoDB)
+### Backend (Express / MongoDB + Socket.IO)
 - **Authentification sécurisée** avec `bcrypt` et `jsonwebtoken`.
 - **Middleware requireAuth** : protège toutes les routes de produits.
 - **CRUD Produits** :
   - `POST /api/product` → créer un produit.
-  - `GET /api/product` → récupérer tous les produits de l’utilisateur.
+  - `GET /api/product` → récupérer tous les produits.
+  - `GET /api/product/:id` → récupérer un produit spécifique.
   - `PATCH /api/product/:id` → modifier un produit.
   - `DELETE /api/product/:id` → supprimer un produit.
-  - `GET /api/product/:id` → récupérer un produit spécifique.
 - **CRUD Utilisateurs** :
   - `POST /api/users/register` → inscription.
   - `POST /api/users/login` → connexion (retourne un token JWT).
+- **WebSocket (Socket.IO)** :
+  - Lors de la **création**, **modification** ou **suppression** d’un produit, le serveur émet un événement (`productCreated`, `productUpdated`, `productDeleted`) à tous les clients connectés.
+  - Chaque client affiche une notification avec le nom de l’utilisateur (username) ayant réalisé l’action.
 
 ---
+
+## 📡 Notifications en temps réel (WebSocket)
+
+Le projet utilise **Socket.IO** pour mettre à jour automatiquement tous les utilisateurs connectés lorsqu’un produit est modifié.  
+
+- Côté **serveur**, après une action CRUD sur un produit, un événement est émis :
+  ```js
+  io.emit('productUpdated', {
+    product: updatedProduct,
+    actor: { id: req.user.id, username: req.user.username }
+  });```
+
+- Côté **client**, l’application React écoute ces événements :
+
+```js
+socket.on('productUpdated', ({ product, actor }) => {
+  setProducts(prev => prev.map(p => (p._id === product._id ? product : p)));
+  setMsg(`🟡 ${actor.username} a modifié « ${product.name} »`);
+});
+```
+Ainsi, toutes les sessions actives restent synchronisées en temps réel et affichent qui a effectué la modification.
 
 ## 📂 Structure du projet
 ```
@@ -100,6 +125,10 @@ Application MERN (MongoDB, Express, React, Node.js) permettant :
 ### Modifier des produits
 
 ![Produits screenshot](./docs/modifier_produit.png)
+
+### Notification avec socket.io
+
+![Produits screenshot](./docs/notification_socket_io.png)
 
 ### Base de données MongoDB
 

@@ -1,6 +1,9 @@
+// src/pageAcceuil.js
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
+// Material UI
 import {
   AppBar, Toolbar, Typography, Button, Container, Paper, Stack, Box,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Alert, Snackbar
@@ -11,24 +14,29 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import LogoBonArtisant from './assets/lesbonsartisans_logo.jpg';
+import carnetImg from './assets/carnet.png';
 
-const API_BASE = '';
+const API_BASE = ''; // proxy CRA ⇒ /api/... ira vers http://localhost:5000
 
 export default function Welcome() {
   const navigate = useNavigate();
   const location = useLocation();
   const [products, setProducts] = React.useState([]);
-  const [msg, setMsg] = React.useState('');            // messages d’erreur/succès
+  const [msg, setMsg] = React.useState('');
   const [snackOpen, setSnackOpen] = React.useState(false);
+  const socketRef = React.useRef(null);
 
+  // Redirection si non authentifié
   React.useEffect(() => {
     if (!localStorage.getItem('token')) {
       navigate('/', { replace: true });
     }
   }, [navigate]);
 
-  const username = location.state?.username || localStorage.getItem('lastUsername') || 'utilisateur';
+  const username =
+    location.state?.username ||
+    localStorage.getItem('lastUsername') ||
+    'utilisateur';
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -40,6 +48,7 @@ export default function Welcome() {
     navigate('/addProduct');
   };
 
+  // Charger TOUS les produits
   const handleSeeProducts = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -65,6 +74,7 @@ export default function Welcome() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Erreur lors de la suppression du produit');
+      // La suppression arrivera aussi via l’event socket, mais on met à jour localement pour réactivité
       setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id));
       setMsg('✅ Produit supprimé');
       setSnackOpen(true);
@@ -79,14 +89,44 @@ export default function Welcome() {
     navigate(`/editProduct/${id}`);
   };
 
+  React.useEffect(() => {
+    if (!localStorage.getItem('token')) return undefined;
+    const socket = io('http://localhost:5000', { transports: ['websocket'] });
+    socketRef.current = socket;
+
+    socket.on('productUpdated', ({ product, actor }) => {
+      setProducts(prev => prev.map(p => ((p._id || p.id) === product._id ? product : p)));
+      setMsg(`🟡 ${actor?.username || 'Un utilisateur'} a modifié « ${product.name} »`);
+      setSnackOpen(true);
+    });
+
+    socket.on('productDeleted', ({ id, actor }) => {
+      setProducts(prev => prev.filter(p => (p._id || p.id) !== id));
+      setMsg(`🔴 ${actor?.username || 'Un utilisateur'} a supprimé un produit`);
+      setSnackOpen(true);
+    });
+
+    socket.on('productCreated', ({ product, actor }) => {
+      setProducts(prev => (prev.some(p => (p._id || p.id) === product._id) ? prev : [product, ...prev]));
+      setMsg(`🟢 ${actor?.username || 'Un utilisateur'} a ajouté « ${product.name} »`);
+      setSnackOpen(true);
+    });
+
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <>
+      {/* Barre supérieure */}
       <AppBar position="static">
         <Toolbar>
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
             <Box
               component="img"
-              src={LogoBonArtisant}
+              src={carnetImg}
               alt="Catalogue produits"
               sx={{ width: 36, height: 36, mr: 1, borderRadius: '6px' }}
             />
@@ -94,39 +134,27 @@ export default function Welcome() {
           </Box>
 
           <Box sx={{ flexGrow: 1 }} />
-
           <Typography sx={{ mr: 2 }} variant="body2">Bonjour, <strong>{username}</strong></Typography>
 
           <Stack direction="row" spacing={1}>
-            <Button
-              color="inherit"
-              startIcon={<AddIcon />}
-              onClick={handleAddProduct}
-            >
+            <Button color="inherit" startIcon={<AddIcon />} onClick={handleAddProduct}>
               Ajouter
             </Button>
-            <Button
-              color="inherit"
-              startIcon={<RefreshIcon />}
-              onClick={handleSeeProducts}
-            >
+            <Button color="inherit" startIcon={<RefreshIcon />} onClick={handleSeeProducts}>
               Afficher
             </Button>
-            <Button
-              color="inherit"
-              startIcon={<LogoutIcon />}
-              onClick={handleLogout}
-            >
+            <Button color="inherit" startIcon={<LogoutIcon />} onClick={handleLogout}>
               Déconnexion
             </Button>
           </Stack>
         </Toolbar>
       </AppBar>
 
+      {/* Contenu */}
       <Container maxWidth="lg" sx={{ py: 3 }}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            Bienvenue, <strong>{username}</strong> !
+            Bienvenue, <strong>{username}</strong> ! Cliquez sur <b>Afficher</b> pour charger <b>tous les produits</b>.
           </Typography>
 
           {products.length > 0 ? (
@@ -140,6 +168,7 @@ export default function Welcome() {
                     <TableCell>Note</TableCell>
                     <TableCell>Garantie (ans)</TableCell>
                     <TableCell>Dispo</TableCell>
+                    <TableCell>Créé par</TableCell>
                     <TableCell align="right" width={180}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -154,6 +183,7 @@ export default function Welcome() {
                         <TableCell>{p.rating ?? '-'}</TableCell>
                         <TableCell>{p.warranty_years ?? '-'}</TableCell>
                         <TableCell>{p.available ? '✅' : '❌'}</TableCell>
+                        <TableCell>{p.createdby?.username ?? '-'}</TableCell>
                         <TableCell align="right">
                           <Stack direction="row" spacing={1} justifyContent="flex-end">
                             <IconButton size="small" onClick={() => handleEditProduct(id)} aria-label="modifier">
@@ -177,11 +207,13 @@ export default function Welcome() {
             </Box>
           ) : (
             <Alert severity="info">
-              Clique sur <strong>“Afficher”</strong> pour afficher tes produits.
+              Clique sur <strong>“Afficher”</strong> pour voir tous les produits disponibles.
             </Alert>
           )}
         </Paper>
       </Container>
+
+      {/* Snackbar messages */}
       <Snackbar
         open={snackOpen}
         autoHideDuration={3500}
@@ -189,7 +221,7 @@ export default function Welcome() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         {msg && (
-          <Alert onClose={() => setSnackOpen(false)} severity={msg.startsWith('❌') ? 'error' : 'success'} sx={{ width: '100%' }}>
+          <Alert onClose={() => setSnackOpen(false)} severity={msg.startsWith('❌') ? 'error' : 'info'} sx={{ width: '100%' }}>
             {msg}
           </Alert>
         )}
