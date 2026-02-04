@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Base de données MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Backend Node.js
+  backend:
+    build: ./server
+    container_name: backend_container
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/votre_nom_bdd
+      - PORT=5000
+      - JWT_SECRET=votre_secret_ici
+    depends_on:
+      - mongodb
+
+  # Frontend React
+  frontend:
+    build: ./Client/Client
+    container_name: frontend_container
+    ports:
+      - "3000:3000"
+    stdin_open: true # Nécessaire pour React/CRA
+    environment:
+      - WDS_SOCKET_PORT=0 # Évite les erreurs de WebSocket en Docker
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
