@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProducts, upsertProduct, removeProduct } from './store/productsSlice';
@@ -20,10 +20,9 @@ const API_BASE = '';
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
   const products = useSelector(state => state.products.items);
-  const { token, username: usernameStore } = useSelector(state => state.auth);
+  const { token } = useSelector(state => state.auth);
   const [msg, setMsg] = React.useState('');
   const [snackOpen, setSnackOpen] = React.useState(false);
 
@@ -86,37 +85,60 @@ export default function Welcome() {
                     <TableCell>Nom</TableCell><TableCell>Type</TableCell><TableCell>Prix</TableCell>
                     <TableCell>Note</TableCell><TableCell>Garantie</TableCell><TableCell>Dispo</TableCell>
                     <TableCell>Créé par</TableCell>
-                    <TableCell>Certificat (Hash)</TableCell> {/* Colonne C26 */}
+                    <TableCell>Certificat (Hash)</TableCell>
                     <TableCell align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {products.map((p) => (
-                    <TableRow key={p._id || p.id} hover>
-                      <TableCell>{p.name}</TableCell><TableCell>{p.type}</TableCell><TableCell>{p.price}</TableCell>
-                      <TableCell>{p.rating ?? '-'}</TableCell><TableCell>{p.warranty_years ?? '-'}</TableCell>
-                      <TableCell>{p.available ? '✅' : '❌'}</TableCell><TableCell>{p.createdby?.username ?? '-'}</TableCell>
-                      <TableCell>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                          {p.hash ? `${p.hash.substring(0, 8)}...` : 'Signé'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton size="small" onClick={() => handleEditProduct(p._id || p.id)}><EditIcon /></IconButton>
-                          <IconButton size="small" color="error" onClick={() => handleDeleteProduct(p._id || p.id)}><DeleteIcon /></IconButton>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {products.map((p) => {
+                    const id = p._id || p.id;
+                    return (
+                      <TableRow key={id} hover>
+                        <TableCell>{p.name}</TableCell>
+                        <TableCell>{p.type}</TableCell>
+                        <TableCell>{p.price}</TableCell>
+                        <TableCell>{p.rating ?? '-'}</TableCell>
+                        <TableCell>{p.warranty_years ?? '-'}</TableCell>
+                        <TableCell>{p.available ? '✅' : '❌'}</TableCell>
+                        <TableCell>{p.createdby?.username ?? '-'}</TableCell>
+                        <TableCell>
+                          <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                            {p.hash ? `${p.hash.substring(0, 8)}...` : 'Signé'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={1} justifyContent="flex-end">
+                            <IconButton size="small" onClick={() => handleEditProduct(id)} aria-label="modifier">
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton size="small" color="error" onClick={() => handleDeleteProduct(id)} aria-label="supprimer">
+                              <DeleteIcon />
+                            </IconButton>
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </Box>
-          ) : <Alert severity="info">Clique sur “Afficher”</Alert>}
+          ) : (
+            <Alert severity="info">
+              Clique sur <strong>“Afficher”</strong> pour voir tous les produits disponibles.
+            </Alert>
+          )}
         </Paper>
       </Container>
-      <Snackbar open={snackOpen} autoHideDuration={3500} onClose={() => setSnackOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="info">{msg}</Alert>
+
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={3500}
+        onClose={() => setSnackOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackOpen(false)} severity={msg.startsWith('❌') ? 'error' : 'info'} sx={{ width: '100%' }}>
+          {msg}
+        </Alert>
       </Snackbar>
     </>
   );
