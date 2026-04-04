@@ -1,0 +1,26 @@
+name: Deploy WebMarket+ to AWS EC2
+
+on:
+  push:
+    branches: [ main ] # Se déclenche dès que tu pushes sur la branche main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/TestTechniqueBonArtisant
+            git pull origin main
+            # On réactive le swap au cas où (sécurité pour le build)
+            sudo swapon /swapfile || true 
+            docker-compose up -d --build
