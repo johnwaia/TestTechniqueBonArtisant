@@ -126,7 +126,7 @@ function Auth() {
           </div>
 
           <div className="actions">
-            <button type="submit" className="btn btn-primary">Créer le compte</button>
+            <button type="submit" className="btn btn-primary">Créer le compte (test CI/CD)</button>
             <button type="button" onClick={handleLoginOnly} className="btn">Connexion</button>
           </div>
 
